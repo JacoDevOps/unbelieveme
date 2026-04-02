@@ -1,0 +1,1152 @@
+<?php require_once 'config.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unbelieveme — Belief Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #1a1916;
+      --surface:    #201f1c;
+      --border:     #2c2a26;
+      --muted:      #5a5650;
+      --text:       #ddd6cc;
+      --accent:     #b8a070;
+      --accent-dim: #7a6a48;
+      --deep:       #38352f;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ════ Keyframes ════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes fadeOutUp {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-12px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.25; }
+      50%       { opacity: 1; }
+    }
+
+    /* ════ Progress bar ════ */
+    #progress-wrap {
+      position: fixed;
+      top: 0; left: 0;
+      height: 1px;
+      background: var(--border);
+      width: 100%;
+      z-index: 200;
+    }
+    #progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.7s ease;
+    }
+
+    /* ════ Fixed logo ════ */
+    #fixed-logo {
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+    #fixed-logo.visible { opacity: 1; }
+
+    /* ════ Screen system ════ */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 32px;
+      opacity: 0;
+      pointer-events: none;
+      overflow-y: auto;
+    }
+    .screen.active {
+      opacity: 1;
+      pointer-events: all;
+      animation: fadeIn 500ms ease forwards;
+    }
+
+    .inner {
+      max-width: 680px;
+      width: 100%;
+    }
+
+    /* ════ Button (universal) ════ */
+    .btn {
+      display: inline-block;
+      border: 1px solid var(--accent-dim);
+      color: var(--accent);
+      background: transparent;
+      padding: 14px 36px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      border-radius: 0;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+      text-decoration: none;
+    }
+    .btn:hover, .btn:focus { background: var(--accent-dim); color: var(--bg); outline: none; }
+    .btn[disabled], .btn:disabled { opacity: 0.35; pointer-events: none; }
+
+    /* ════ IMMERSIVE QUOTE SCREEN ════ */
+    .quote-screen {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 32px;
+      text-align: center;
+    }
+
+    .big-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.4;
+      max-width: 600px;
+      margin: 0 auto 24px;
+      opacity: 0;
+      animation: fadeIn 900ms ease 0ms forwards;
+    }
+
+    .big-cite {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--deep);
+      font-style: normal;
+      opacity: 0;
+      animation: fadeIn 900ms ease 800ms forwards;
+    }
+
+    /* ════ TRANSITION TEXT SCREEN ════ */
+    .t-inner {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .t-body {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.85;
+      opacity: 0;
+      animation: fadeUp 700ms ease 0ms forwards;
+    }
+    .t-body p { margin-bottom: 18px; }
+    .t-body p:last-child { margin-bottom: 0; }
+
+    .t-btn-wrap {
+      text-align: center;
+      opacity: 0;
+      animation: fadeIn 500ms ease 600ms forwards;
+    }
+
+    /* ════ OPENING SCREEN ════ */
+    #screen-opening .t-inner { text-align: left; }
+    #screen-opening .t-body  { text-align: left; margin: 0 0 40px; }
+    #screen-opening .t-btn-wrap { text-align: left; }
+
+    /* ════ QUESTION SCREEN ════ */
+    .q-wrap { max-width: 600px; width: 100%; }
+
+    .q-number {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .q-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1.5;
+      max-width: 560px;
+      margin-bottom: 12px;
+    }
+
+    /* Question clarification hint */
+    .q-hint {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--deep);
+      margin-top: 10px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    textarea.q-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      padding: 16px;
+      border-radius: 0;
+      outline: none;
+      resize: none;
+      width: 100%;
+      min-height: 120px;
+      line-height: 1.8;
+      caret-color: var(--accent);
+      transition: border-color 0.25s ease;
+      margin-bottom: 8px;
+    }
+    textarea.q-input::placeholder { color: var(--deep); }
+    textarea.q-input:focus { border-color: var(--accent-dim); }
+
+    .q-kbd {
+      font-size: 10px;
+      color: var(--deep);
+      letter-spacing: 0.08em;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    /* question fade animations */
+    .q-out .q-number,
+    .q-out .q-text,
+    .q-out .q-hint,
+    .q-out textarea.q-input,
+    .q-out .q-kbd {
+      animation: fadeOutUp 350ms ease forwards;
+    }
+
+    .q-in .q-number  { opacity: 0; animation: fadeUp 400ms ease 0ms   forwards; }
+    .q-in .q-text    { opacity: 0; animation: fadeUp 400ms ease 40ms  forwards; }
+    .q-in .q-hint    { opacity: 0; animation: fadeUp 400ms ease 80ms  forwards; }
+    .q-in textarea.q-input { opacity: 0; animation: fadeUp 400ms ease 100ms forwards; }
+    .q-in .q-kbd     { opacity: 0; animation: fadeUp 400ms ease 120ms forwards; }
+
+    /* ════ LOADING SCREEN ════ */
+    .loading-wrap { text-align: center; }
+
+    .loading-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .loading-dots span {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin: 0 4px;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    .loading-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      animation: fadeIn 600ms ease 400ms forwards;
+    }
+
+    /* ════ REPORT SCREEN ════ */
+    #screen-report {
+      position: relative;
+      padding-top: 72px;
+      padding-bottom: 120px;
+      justify-content: flex-start;
+    }
+
+    .report-logo {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    /* IntersectionObserver fade-up */
+    .rs {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .rs.visible { opacity: 1; transform: translateY(0); }
+
+    .section-label {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .pattern-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: 22px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .section-body {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    .report-section { margin-bottom: 56px; }
+
+    /* ── Belief card ── */
+    .belief-card {
+      border-top: 2px solid var(--accent-dim);
+      padding-top: 28px;
+      margin-bottom: 44px;
+    }
+
+    .belief-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1.3;
+      margin-bottom: 28px;
+    }
+
+    .belief-row { margin-bottom: 22px; }
+
+    .belief-row-label {
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .belief-body {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    /* ── Report divider ── */
+    .report-rule {
+      width: 40px;
+      height: 1px;
+      background: var(--border);
+      margin: 0 auto 56px;
+    }
+
+    /* ── CLOSING MOMENT ── */
+    .closing-moment {
+      padding: 80px 24px;
+      text-align: center;
+      max-width: 560px;
+      margin: 60px auto 0;
+    }
+
+    .closing-rule {
+      width: 40px;
+      height: 1px;
+      background: var(--border);
+      margin: 0 auto 40px;
+    }
+
+    .closing-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 300;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .closing-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 30px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    /* ── Report CTAs ── */
+    .report-ctas {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .cta-primary {
+      display: block;
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto;
+      padding: 18px 36px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+      text-decoration: none;
+      border-radius: 0;
+    }
+    .cta-primary:hover { background: var(--accent); color: var(--bg); }
+
+    .cta-secondary {
+      display: block;
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto;
+      padding: 18px 36px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.3s ease, color 0.3s ease;
+      text-decoration: none;
+      border-radius: 0;
+    }
+    .cta-secondary:hover { border-color: var(--muted); color: var(--text); }
+
+    .email-note {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    /* ── What to do ── */
+    .what-to-do-label {
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .what-to-do-body {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.85;
+    }
+    .what-to-do-body p { margin-bottom: 18px; }
+    .what-to-do-body p:last-child { margin-bottom: 0; }
+
+    .report-footer {
+      font-size: 10px;
+      color: var(--deep);
+      text-align: center;
+      margin-top: 80px;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      padding: 10px 22px;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 500;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Error banner ── */
+    #err-banner {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--accent-dim);
+      color: var(--muted);
+      font-size: 12px;
+      padding: 10px 22px;
+      z-index: 600;
+      display: none;
+      max-width: 460px;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .screen { padding: 70px 20px 70px; }
+      .big-quote { font-size: 24px; }
+      .q-text { font-size: 20px; }
+      .pattern-text { font-size: 18px; }
+      .closing-question { font-size: 24px; }
+    }
+  </style>
+</head>
+<body
+  id="app"
+  data-calendly="<?php echo defined('CALENDLY_LINK') ? htmlspecialchars(CALENDLY_LINK) : '#'; ?>"
+>
+
+  <div id="progress-wrap"><div id="progress-fill"></div></div>
+  <div id="fixed-logo">Unbelieveme</div>
+  <div id="err-banner"></div>
+
+  <!-- ══════════════════════════════════════
+       GATE — no valid session
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-gate">
+    <div class="inner" style="text-align:center;">
+      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--muted);margin-bottom:28px;">
+        Please complete payment to begin.
+      </p>
+      <a class="btn" href="index.php">Visit Unbelieveme →</a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       OPENING SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-opening">
+    <div class="t-inner" style="text-align:left;max-width:600px;">
+      <div class="t-body" style="text-align:left;margin:0 0 40px;">
+        <p>You are about to do something most people never do.</p>
+        <p>Not because it's difficult. Because nobody ever showed them how.</p>
+        <p>Most of us move through life reacting — to situations, to people, to opportunities — without ever asking why we react the way we do. We feel stuck in the same patterns. We want things we can't seem to get. We make the same decisions again and again and wonder why the results don't change.</p>
+        <p>The answer is almost never laziness. It's almost never lack of information. It's beliefs.</p>
+        <p>A belief is not an opinion. You know you have opinions — you can see them, argue them, change them. A belief is something deeper. A conclusion you drew at some point in your life that felt so true, so confirmed by experience, that it stopped feeling like a conclusion and started feeling like reality itself.</p>
+        <p>These beliefs don't feel like beliefs. They feel like facts. They feel like just the way things are.</p>
+        <p>This assessment will ask you about your life — specific situations, real feelings, actual patterns — and from your answers, surface the beliefs running underneath. Not the ones you think you have. The ones your behaviour reveals.</p>
+        <p>Answer with the first thing that comes. Not the best version of yourself — the honest one. There are no right answers. There is only what's true.</p>
+        <p style="font-style:italic;color:var(--deep);font-family:'DM Sans',sans-serif;font-size:13px;margin-top:8px;">"It ain't what you don't know that gets you into trouble. It's what you know for sure that just ain't so." — Mark Twain</p>
+      </div>
+      <div class="t-btn-wrap" style="text-align:left;">
+        <button class="btn" id="btn-open">I'm ready to begin →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       QUESTION SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-question">
+    <div class="q-wrap" id="q-wrap">
+      <div class="q-number" id="q-number">Question 1 of 20</div>
+      <div class="q-text"   id="q-text"></div>
+      <p   class="q-hint"   id="q-hint"></p>
+      <textarea class="q-input" id="q-input" placeholder="Write your answer here…" rows="5"></textarea>
+      <p class="q-kbd">Cmd + Enter to continue</p>
+      <div style="margin-top:4px;">
+        <button class="btn" id="btn-continue" disabled>Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       T12 — QUOTE SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-t12-quote">
+    <div class="quote-screen">
+      <blockquote class="big-quote">"We don't see things as they are. We see them as we are."</blockquote>
+      <cite class="big-cite">— Anaïs Nin</cite>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       T12 — TEXT SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-t12-text">
+    <div class="t-inner">
+      <div class="t-body">
+        <p>You've just described your life — where it feels stuck, where it flows, what you want, what you avoid.</p>
+        <p>A belief isn't just a thought you have. It's a filter through which all experience passes. Your brain selects what to notice based on what it already believes to be true. If you believe 'I have to earn my place,' it will gather evidence for that belief continuously, automatically, and without your permission. It will filter out — literally not register — the moments that contradict it.</p>
+        <p>This isn't a flaw. It's how perception works for every human being.</p>
+        <p>The question is: what is your filter set to?</p>
+        <p>The next questions go deeper into the specific areas of your life where your beliefs are most active right now. Stay specific. The more concrete your answers, the clearer the picture becomes.</p>
+      </div>
+      <div class="t-btn-wrap">
+        <button class="btn" id="btn-t12">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       LOADING PHASE 2
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-load-p2">
+    <div class="loading-wrap">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      <div class="loading-label">Reading your answers carefully...</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       T23 — QUOTE SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-t23-quote">
+    <div class="quote-screen">
+      <blockquote class="big-quote">"Until you make the unconscious conscious, it will direct your life and you will call it fate."</blockquote>
+      <cite class="big-cite">— Carl Jung</cite>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       T23 — TEXT SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-t23-text">
+    <div class="t-inner">
+      <div class="t-body">
+        <p>Something specific appeared in what you just shared. A pattern. A feeling that kept returning in different forms.</p>
+        <p>The next questions follow that thread directly. They are generated from your answers — not random.</p>
+        <p>A note on what you might feel right now: sometimes people notice a subtle resistance here. A desire to give a slightly safer answer than the true one. That's worth noticing. It usually means the questions are getting close to something the belief has been protecting.</p>
+        <p>Every belief you hold was formed for a reason. At some moment — often in childhood or early adulthood — you had an experience, drew a conclusion, and that conclusion became a lens. These conclusions weren't wrong at the time. They were logical responses to real experiences.</p>
+        <p>The problem is that beliefs don't automatically update when the circumstances that created them change. That's what you're doing right now. Looking.</p>
+      </div>
+      <div class="t-btn-wrap">
+        <button class="btn" id="btn-t23">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       LOADING PHASE 3
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-load-p3">
+    <div class="loading-wrap">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      <div class="loading-label">Going deeper...</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PRE-REPORT — QUOTE SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-pre-quote">
+    <div class="quote-screen">
+      <blockquote class="big-quote">"The cave you fear to enter holds the treasure you seek."</blockquote>
+      <cite class="big-cite">— Carl Jung</cite>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PRE-REPORT — TEXT SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-pre-text">
+    <div class="t-inner" style="text-align:center;">
+      <div class="t-body" style="text-align:center;">
+        <p>Your answers are being read carefully now.</p>
+        <p>Not to judge. Not to diagnose.</p>
+        <p>To find the patterns that are difficult to see from inside your own life — and name them clearly, so you can finally decide what to do with them.</p>
+        <p>What you're about to read was written from your answers. If something lands as true, it's because it came from you.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       LOADING REPORT
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-load-report">
+    <div class="loading-wrap">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      <div class="loading-label">Your report is being written...</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       REPORT SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-report">
+    <div class="inner">
+
+      <div class="report-logo">Unbelieveme</div>
+
+      <!-- 1. Pattern -->
+      <div class="report-section rs" id="rs-pattern">
+        <div class="section-label">What we found</div>
+        <div class="pattern-text" id="r-pattern"></div>
+      </div>
+
+      <!-- 2. Values -->
+      <div class="report-section rs" id="rs-values">
+        <div class="section-label">What you actually value</div>
+        <div class="section-body" id="r-values"></div>
+      </div>
+
+      <!-- 3. Beliefs -->
+      <div class="report-section rs" id="rs-beliefs">
+        <div class="section-label">Your beliefs</div>
+        <div id="r-beliefs-container"></div>
+      </div>
+
+      <!-- 4. Goal insight -->
+      <div class="report-section rs" id="rs-goal">
+        <div class="section-label">Your goal</div>
+        <div class="section-body" id="r-goal"></div>
+      </div>
+
+      <div class="report-rule rs" id="rs-rule1"></div>
+
+      <!-- 5. What to do (moved before closing question) -->
+      <div class="report-section rs" id="rs-what">
+        <div class="what-to-do-label">After the assessment</div>
+        <div class="what-to-do-body">
+          <p>Awareness is the first step. But awareness without direction fades.</p>
+          <p>Beliefs don't change through thinking. They change through experience.</p>
+          <p>You cannot argue yourself out of a belief that feels like fact. The only thing that changes a belief is a new experience that contradicts it — followed by the reflection that integrates what that experience meant.</p>
+          <p>The structure is always: New behaviour → New experience → Reflection → Belief update.</p>
+          <p>This is why the first move for each belief matters more than any insight in this report. The insight shows you the belief. The behaviour begins to change it.</p>
+          <p>One more thing: beliefs become identity. 'I am someone who struggles with money.' 'I am someone who doesn't finish things.' When a belief becomes identity, changing it feels like self-erasure. That's why the shift described for each belief isn't a new thought — it's a new way of being. Built one action at a time.</p>
+        </div>
+      </div>
+
+      <!-- 6. Closing question (emotional peak) -->
+      <div class="rs" id="rs-closing">
+        <div class="closing-moment">
+          <div class="closing-rule"></div>
+          <p class="closing-label">A question to stay with</p>
+          <p class="closing-question" id="r-closing"></p>
+          <div class="closing-rule" style="margin-top:40px;"></div>
+        </div>
+      </div>
+
+      <!-- 7. CTAs -->
+      <div class="report-section rs" id="rs-ctas">
+        <div class="report-ctas">
+          <a class="cta-primary" id="cta-book" href="#" target="_blank" rel="noopener">Book a session →</a>
+          <button class="cta-secondary" id="cta-download">Download report →</button>
+          <button class="cta-secondary" id="cta-share">Share this →</button>
+        </div>
+        <p class="email-note">A copy of your report has been sent to your email.</p>
+      </div>
+
+      <div class="report-footer">© Unbelieveme 2026 · quiz@unbelieveme.com</div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast">Link copied</div>
+
+  <!-- ══════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════ -->
+  <script>
+  (function() {
+
+    /* ── Session ─────────────────────────── */
+    const params    = new URLSearchParams(window.location.search);
+    let sessionId   = params.get('session_id') || sessionStorage.getItem('session_id');
+    let userEmail   = params.get('email')      || sessionStorage.getItem('user_email') || '';
+    const CALENDLY  = document.getElementById('app').dataset.calendly || '#';
+
+    if (!sessionId) { show('screen-gate'); return; }
+    sessionStorage.setItem('session_id', sessionId);
+    if (userEmail) sessionStorage.setItem('user_email', userEmail);
+
+    /* ── State ───────────────────────────── */
+    const TOTAL  = 20;
+    let phase    = 1, qIdx = 0;
+    let answers  = {}, p2Qs = [], p3Qs = [];
+    let reportReady = false, reportData = null;
+
+    const phase1Qs = [
+      { id:'q1',  hint:'The first words that come — not the considered ones.',
+        text:'If you had to describe where you are in your life right now in three words — not how you want to be, just honestly where you are — what would those three words be?' },
+      { id:'q2',  hint:'The honest answer, not the noble one.',
+        text:'What do you want most right now — the thing that, if it changed, would change everything else?' },
+      { id:'q3',  hint:'The place where trying harder doesn\'t seem to help.',
+        text:'Where in your life do you feel the most friction — the place where effort doesn\'t seem to translate into progress, or where the same situation keeps returning?' },
+      { id:'q4',  hint:'What makes that area different — what you do, feel, or allow there.',
+        text:'Think about the area of your life you\'re most satisfied with right now. What\'s different about that area compared to the ones that feel harder?' },
+      { id:'q5',  hint:'Something real that you\'ve been circling without landing on.',
+        text:'What\'s something you\'ve wanted for a long time that you haven\'t allowed yourself to fully pursue? Not something impossible — something that was possible, but didn\'t happen.' },
+      { id:'q6',  hint:'Concrete. Where do you wake up. What do you do first. Who is there.',
+        text:'When you imagine the version of your life that would feel fully right — not perfect, just right — what does a normal Tuesday look like?' },
+      { id:'q7',  hint:'Not what you fear — what you actively arrange your days around not feeling.',
+        text:'What feeling are you most trying to avoid in your daily life — the one you organise things around not having?' },
+      { id:'q8',  hint:'The condition that keeps moving forward every time you get close to it.',
+        text:'What do you believe you need to have or be before your life can really begin — the condition you\'re waiting to meet?' },
+      { id:'q9',  hint:'Two different answers — one place where you\'re real, one where you perform.',
+        text:'Where in your life do you feel most like yourself — most natural, most unguarded? And where do you feel most like a version of yourself you\'re performing?' },
+      { id:'q10', hint:'The observation that lands even when you wish it didn\'t.',
+        text:'What do people close to you say about you — the things they notice that you sometimes wish they didn\'t?' },
+    ];
+
+    /* ── DOM ─────────────────────────────── */
+    const progressFill = document.getElementById('progress-fill');
+    const fixedLogo    = document.getElementById('fixed-logo');
+    const qWrap        = document.getElementById('q-wrap');
+    const qNumber      = document.getElementById('q-number');
+    const qText        = document.getElementById('q-text');
+    const qHint        = document.getElementById('q-hint');
+    const qInput       = document.getElementById('q-input');
+    const btnContinue  = document.getElementById('btn-continue');
+    const errBanner    = document.getElementById('err-banner');
+
+    /* ── Screen ──────────────────────────── */
+    function show(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function setProgress(n) {
+      progressFill.style.width = Math.round((n / TOTAL) * 100) + '%';
+    }
+
+    function showErr(msg, dur = 7000) {
+      errBanner.textContent = msg;
+      errBanner.style.display = 'block';
+      setTimeout(() => { errBanner.style.display = 'none'; }, dur);
+    }
+
+    /* ── Current question set ────────────── */
+    function curQs() {
+      return phase === 1 ? phase1Qs : phase === 2 ? p2Qs : p3Qs;
+    }
+
+    function globalN() {
+      return phase === 1 ? qIdx + 1 : phase === 2 ? 10 + qIdx + 1 : 16 + qIdx + 1;
+    }
+
+    /* ── Render question ─────────────────── */
+    function renderQ(animate) {
+      const q   = curQs()[qIdx];
+      const num = globalN();
+
+      const doRender = () => {
+        qNumber.textContent = 'Question ' + num + ' of ' + TOTAL;
+        qText.textContent   = q.text;
+
+        // Hint: show for Phase 1 only
+        if (phase === 1 && q.hint) {
+          qHint.textContent = q.hint;
+          qHint.style.display = 'block';
+        } else {
+          qHint.textContent = '';
+          qHint.style.display = 'none';
+        }
+
+        qInput.value = answers[q.id] || '';
+        updateBtn();
+        setProgress(num - 1);
+
+        if (animate) {
+          qWrap.classList.remove('q-in', 'q-out');
+          void qWrap.offsetHeight;
+          qWrap.classList.add('q-in');
+          setTimeout(() => qWrap.classList.remove('q-in'), 460);
+        }
+
+        show('screen-question');
+        fixedLogo.classList.add('visible');
+        setTimeout(() => qInput.focus(), 480);
+      };
+
+      if (animate) {
+        qWrap.classList.add('q-out');
+        setTimeout(doRender, 430);
+      } else {
+        doRender();
+      }
+    }
+
+    function updateBtn() {
+      btnContinue.disabled = qInput.value.trim().length < 8;
+    }
+
+    qInput.addEventListener('input', updateBtn);
+    qInput.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !btnContinue.disabled) {
+        btnContinue.click();
+      }
+    });
+
+    /* ── Save ────────────────────────────── */
+    async function save(id, val) {
+      answers[id] = val;
+      try {
+        await fetch('api.php?action=save_answers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId, answers: { [id]: val } })
+        });
+      } catch (_) {}
+    }
+
+    /* ── Continue ────────────────────────── */
+    btnContinue.addEventListener('click', async () => {
+      const q   = curQs()[qIdx];
+      const val = qInput.value.trim();
+      if (val.length < 8) return;
+      btnContinue.disabled = true;
+      await save(q.id, val);
+      btnContinue.disabled = false;
+      qIdx++;
+
+      if (phase === 1) {
+        if (qIdx < phase1Qs.length) { renderQ(true); }
+        else { setProgress(10); showT12Quote(); }
+      } else if (phase === 2) {
+        if (qIdx < p2Qs.length) { renderQ(true); }
+        else { setProgress(16); showT23Quote(); }
+      } else {
+        if (qIdx < p3Qs.length) { renderQ(true); }
+        else { setProgress(20); showPreQuote(); }
+      }
+    });
+
+    /* ── Quote → text auto-transitions ───── */
+    function showT12Quote() {
+      show('screen-t12-quote');
+      setTimeout(() => show('screen-t12-text'), 3500);
+    }
+
+    function showT23Quote() {
+      show('screen-t23-quote');
+      setTimeout(() => show('screen-t23-text'), 3500);
+    }
+
+    function showPreQuote() {
+      show('screen-pre-quote');
+      // Start fetching report in background immediately
+      const reportPromise = fetchReport();
+      setTimeout(() => {
+        show('screen-pre-text');
+        setTimeout(() => {
+          show('screen-load-report');
+          // Report may already be done, or wait for it
+          reportPromise.then(r => {
+            if (r) { renderReport(r); show('screen-report'); initIO(); }
+          });
+        }, 2200);
+      }, 3500);
+    }
+
+    /* ── Fetch Phase 2 ───────────────────── */
+    async function fetchP2() {
+      show('screen-load-p2');
+      try {
+        const res  = await fetch('api.php?action=generate_phase2', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers })
+        });
+        const data = await res.json();
+        if (data.questions?.length) { p2Qs = data.questions; return true; }
+        throw new Error(data.error || 'No questions');
+      } catch (e) {
+        showErr('Could not generate personalised questions. Please try again.');
+        show('screen-t12-text');
+        return false;
+      }
+    }
+
+    /* ── Fetch Phase 3 ───────────────────── */
+    async function fetchP3() {
+      show('screen-load-p3');
+      try {
+        const res  = await fetch('api.php?action=generate_phase3', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers })
+        });
+        const data = await res.json();
+        if (data.questions?.length) { p3Qs = data.questions; return true; }
+        throw new Error(data.error || 'No questions');
+      } catch (e) {
+        showErr('Could not generate deeper questions. Please try again.');
+        show('screen-t23-text');
+        return false;
+      }
+    }
+
+    /* ── Fetch Report ────────────────────── */
+    async function fetchReport() {
+      try {
+        const res  = await fetch('api.php?action=generate_report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId, email: userEmail, answers })
+        });
+        const data = await res.json();
+        if (data.report) { reportData = data.report; return data.report; }
+        throw new Error(data.error || 'No report');
+      } catch (e) {
+        showErr('Could not generate your report. Please refresh and try again.', 12000);
+        return null;
+      }
+    }
+
+    /* ── Render report ───────────────────── */
+    function esc(s) {
+      return (s || '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/\n/g,'<br>');
+    }
+
+    function renderReport(r) {
+      document.getElementById('r-pattern').innerHTML = esc(r.pattern || '');
+      document.getElementById('r-values').innerHTML  = esc(r.values  || '');
+      document.getElementById('r-goal').innerHTML    = esc(r.goal_insight || '');
+      document.getElementById('r-closing').innerHTML = esc(r.closing_question || '');
+
+      const container = document.getElementById('r-beliefs-container');
+      container.innerHTML = '';
+      (r.beliefs || []).forEach(b => {
+        const card = document.createElement('div');
+        card.className = 'belief-card';
+        card.innerHTML =
+          '<div class="belief-name">'    + esc(b.name) + '</div>' +
+          bRow('Where it shows up',       b.where_it_shows_up) +
+          bRow("What it's protecting",    b.identity_protecting) +
+          bRow("What it's costing you",   b.cost) +
+          bRow('The shift',               b.fundamental_shift) +
+          bRow('First move',              b.first_move);
+        container.appendChild(card);
+      });
+
+      document.getElementById('cta-book').href = CALENDLY;
+    }
+
+    function bRow(label, text) {
+      return '<div class="belief-row">' +
+        '<div class="belief-row-label">' + esc(label)      + '</div>' +
+        '<div class="belief-body">'      + esc(text || '') + '</div>' +
+        '</div>';
+    }
+
+    /* ── IntersectionObserver ────────────── */
+    function initIO() {
+      const els = document.querySelectorAll('.rs');
+      if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('visible')); return; }
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+      }, { threshold: 0.12 });
+      els.forEach(e => obs.observe(e));
+    }
+
+    /* ── CTAs ────────────────────────────── */
+    document.getElementById('cta-download').addEventListener('click', () => {
+      window.location.href = 'api.php?action=download_report&session_id=' + encodeURIComponent(sessionId);
+    });
+
+    document.getElementById('cta-share').addEventListener('click', () => {
+      const url  = 'https://unbelieveme.com';
+      const text = 'I just did something I\'ve never done before — a belief assessment that showed me what\'s actually been running my life. Worth 20 minutes of your time: unbelieveme.com';
+      if (navigator.share) {
+        navigator.share({ text, url });
+      } else {
+        navigator.clipboard.writeText(url).then(() => {
+          const t = document.getElementById('toast');
+          t.textContent = 'Link copied';
+          t.classList.add('show');
+          setTimeout(() => t.classList.remove('show'), 2800);
+        });
+      }
+    });
+
+    /* ── Transition buttons ──────────────── */
+    document.getElementById('btn-open').addEventListener('click', () => {
+      phase = 1; qIdx = 0; renderQ(false);
+    });
+
+    document.getElementById('btn-t12').addEventListener('click', async () => {
+      const ok = await fetchP2();
+      if (ok) { phase = 2; qIdx = 0; renderQ(false); }
+    });
+
+    document.getElementById('btn-t23').addEventListener('click', async () => {
+      const ok = await fetchP3();
+      if (ok) { phase = 3; qIdx = 0; renderQ(false); }
+    });
+
+    /* ── Init ────────────────────────────── */
+    show('screen-opening');
+    setProgress(0);
+
+  })();
+  </script>
+</body>
+</html>

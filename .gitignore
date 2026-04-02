@@ -1,0 +1,4 @@
+config.php
+data/*.json
+vendor/
+.DS_Store
