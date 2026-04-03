@@ -241,7 +241,7 @@
 
     .section-body {
       font-size: 16px;
-      color: #7a7470;
+      color: #8a8480;
       line-height: 1.85;
       max-width: 560px;
     }
@@ -297,14 +297,14 @@
 
     .feature-row-text {
       font-size: 15px;
-      color: #5a5650;
+      color: #8a8480;
       line-height: 1.8;
     }
 
     /* CTA note */
     .cta-note {
       font-size: 15px;
-      color: #5a5650;
+      color: #8a8480;
       max-width: 400px;
       margin: 0 auto 40px;
       line-height: 1.85;

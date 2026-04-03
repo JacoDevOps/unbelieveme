@@ -189,6 +189,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       animation: fadeUp 700ms ease 0ms forwards;
     }
     .t-body p { margin-bottom: 18px; }
+    .t-body p { color: #ddd6cc; font-size: clamp(1rem, 1.8vw, 1.1rem); }
     .t-body p:last-child { margin-bottom: 0; }
 
     .t-btn-wrap {
@@ -578,13 +579,16 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       flex-direction: column;
       align-items: flex-end;
       gap: 6px;
+      background: rgba(26,25,22,0.95);
+      border: 1px solid #b8a070;
+      padding: 12px 16px;
     }
     #dev-nav.active { display: flex; }
     .dev-label {
       font-size: 9px;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--deep);
+      color: #ffffff;
       margin-bottom: 4px;
       text-align: right;
     }
@@ -593,24 +597,23 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       gap: 6px;
     }
     .dev-btn {
-      background: #2a2820;
-      border: 1px solid #b8a070;
-      color: #b8a070;
+      background: #ffffff;
+      border: 2px solid #ffffff;
+      color: #1a1916;
       font-family: 'DM Sans', sans-serif;
       font-size: 11px;
-      font-weight: 300;
-      letter-spacing: 0.1em;
+      font-weight: 400;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      padding: 8px 14px;
+      padding: 10px 18px;
       cursor: pointer;
       border-radius: 0;
-      transition: border-color 0.2s, color 0.2s;
     }
-    .dev-btn:hover { border-color: var(--accent); color: var(--text); }
+    .dev-btn:hover { background: #b8a070; border-color: #b8a070; color: #1a1916; }
     .dev-step-label {
       font-size: 9px;
       letter-spacing: 0.12em;
-      color: var(--deep);
+      color: #c8c0b4;
       text-align: right;
     }
   </style>
@@ -638,6 +641,16 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
   </div>
 
   <!-- ══════════════════════════════════════
+       OPENING QUOTE SCREEN
+  ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-opening-quote">
+    <div class="quote-screen">
+      <blockquote class="big-quote">"It ain't what you don't know that gets you into trouble. It's what you know for sure that just ain't so."</blockquote>
+      <cite class="big-cite">— Mark Twain</cite>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
        OPENING SCREEN
   ═══════════════════════════════════════ -->
   <div class="screen" id="screen-opening">
@@ -651,7 +664,6 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
         <p>These beliefs don't feel like beliefs. They feel like facts. They feel like just the way things are.</p>
         <p>This assessment will ask you about your life — specific situations, real feelings, actual patterns — and from your answers, surface the beliefs running underneath. Not the ones you think you have. The ones your behaviour reveals.</p>
         <p>Answer with the first thing that comes. Not the best version of yourself — the honest one. There are no right answers. There is only what's true.</p>
-        <p style="font-style:italic;color:var(--deep);font-family:'DM Sans',sans-serif;font-size:13px;margin-top:8px;">"It ain't what you don't know that gets you into trouble. It's what you know for sure that just ain't so." — Mark Twain</p>
       </div>
       <div class="t-btn-wrap" style="text-align:left;">
         <button class="btn" id="btn-open">I'm ready to begin →</button>
@@ -864,8 +876,8 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
   <div id="dev-nav">
     <div class="dev-label">Dev Preview</div>
     <div class="dev-btns">
-      <button class="dev-btn" onclick="devPrev()">← Prev</button>
-      <button class="dev-btn" onclick="devNext()">Next →</button>
+      <button class="dev-btn" id="dev-prev" onclick="devPrev()">← Prev</button>
+      <button class="dev-btn" id="dev-next" onclick="devNext()">Next →</button>
     </div>
     <div class="dev-step-label" id="dev-step-label">—</div>
   </div>
@@ -1054,12 +1066,12 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     /* ── Quote → text auto-transitions ───── */
     function showT12Quote() {
       show('screen-t12-quote');
-      setTimeout(() => show('screen-t12-text'), 3500);
+      setTimeout(() => show('screen-t12-text'), 4000);
     }
 
     function showT23Quote() {
       show('screen-t23-quote');
-      setTimeout(() => show('screen-t23-text'), 3500);
+      setTimeout(() => show('screen-t23-text'), 4000);
     }
 
     function showPreQuote() {
@@ -1075,7 +1087,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
             if (r) { renderReport(r); show('screen-report'); initIO(); }
           });
         }, 2200);
-      }, 3500);
+      }, 4000);
     }
 
     /* ── Fetch Phase 2 ───────────────────── */
@@ -1217,8 +1229,9 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     });
 
     /* ── Init ────────────────────────────── */
-    show('screen-opening');
+    show('screen-opening-quote');
     setProgress(0);
+    setTimeout(() => show('screen-opening'), 4000);
 
   })();
 
@@ -1228,6 +1241,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
   var _devStepIdx = 0;
 
   var _devSteps = [
+    { label: 'Opening Quote',   fn: function() { _devShow('screen-opening-quote'); _devProgress(0); } },
     { label: 'Opening',         fn: function() { _devShow('screen-opening'); _devProgress(0); } },
     { label: 'Q1 — Phase 1',    fn: function() { _devShowQ(1, 1, 'If you had to describe where you are in your life right now in three words — not how you want to be, just honestly where you are — what would those three words be?', 'The first words that come — not the considered ones.'); } },
     { label: 'Q5 — Phase 1',    fn: function() { _devShowQ(5, 1, 'What\'s something you\'ve wanted for a long time that you haven\'t allowed yourself to fully pursue?', 'Something real that you\'ve been circling without landing on.'); } },
