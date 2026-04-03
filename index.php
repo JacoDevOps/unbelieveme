@@ -29,7 +29,7 @@
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 16px;
+      font-size: clamp(1rem, 1.5vw, 1.15rem);
       line-height: 1.8;
       -webkit-font-smoothing: antialiased;
     }
@@ -110,7 +110,7 @@
 
     .hero-subheadline {
       font-size: clamp(1rem, 1.8vw, 1.15rem);
-      color: #9a9288;
+      color: #b8b0a4;
       max-width: 480px;
       margin: 0 auto 40px;
       line-height: 1.8;
@@ -222,7 +222,7 @@
     .section-label {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 10px;
+      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
       letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--accent);
@@ -233,7 +233,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
       font-style: italic;
-      font-size: clamp(1.6rem, 3vw, 2.25rem);
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
       line-height: 1.3;
       color: #ddd6cc;
       margin-bottom: 32px;
@@ -241,7 +241,7 @@
 
     .section-body {
       font-size: 16px;
-      color: #8a8480;
+      color: #c8c0b4;
       line-height: 1.85;
       max-width: 560px;
     }
@@ -297,14 +297,14 @@
 
     .feature-row-text {
       font-size: 15px;
-      color: #8a8480;
+      color: #c8c0b4;
       line-height: 1.8;
     }
 
     /* CTA note */
     .cta-note {
       font-size: 15px;
-      color: #8a8480;
+      color: #c8c0b4;
       max-width: 400px;
       margin: 0 auto 40px;
       line-height: 1.85;
