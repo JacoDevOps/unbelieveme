@@ -149,7 +149,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
 
     .big-quote {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 36px;
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
       font-weight: 300;
       font-style: italic;
       color: #ddd6cc;
@@ -166,7 +166,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-weight: 300;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--deep);
+      color: #7a7470;
       font-style: normal;
       opacity: 0;
       animation: fadeIn 900ms ease 800ms forwards;
@@ -180,7 +180,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     }
 
     .t-body {
-      font-size: 18px;
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
       color: #ddd6cc;
       max-width: 560px;
       margin: 0 auto 40px;
@@ -211,11 +211,12 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       text-transform: uppercase;
       color: var(--muted);
       margin-bottom: 20px;
+      display: none;
     }
 
     .q-text {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
+      font-size: clamp(1.3rem, 2.5vw, 1.7rem);
       font-weight: 300;
       color: #ddd6cc;
       line-height: 1.5;
@@ -226,9 +227,9 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     /* Question clarification hint */
     .q-hint {
       font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
+      font-size: clamp(0.8rem, 1.4vw, 0.9rem);
       font-weight: 300;
-      color: var(--deep);
+      color: #7a7470;
       margin-top: 10px;
       margin-bottom: 20px;
       line-height: 1.6;
@@ -329,7 +330,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
 
     /* IntersectionObserver fade-up */
     .rs {
-      opacity: 0;
+      opacity: 0.01;
       transform: translateY(14px);
       transition: opacity 0.65s ease, transform 0.65s ease;
     }
@@ -349,14 +350,14 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
       font-style: italic;
-      font-size: 22px;
+      font-size: clamp(1.2rem, 2vw, 1.5rem);
       color: var(--text);
       line-height: 1.6;
     }
 
     .section-body {
       font-size: 15px;
-      color: var(--muted);
+      color: #7a7470;
       line-height: 1.85;
     }
 
@@ -371,7 +372,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
 
     .belief-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 28px;
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
       font-weight: 300;
       color: #ddd6cc;
       line-height: 1.3;
@@ -592,20 +593,20 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       gap: 6px;
     }
     .dev-btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--muted);
+      background: #2a2820;
+      border: 1px solid #b8a070;
+      color: #b8a070;
       font-family: 'DM Sans', sans-serif;
-      font-size: 9px;
+      font-size: 11px;
       font-weight: 300;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       padding: 8px 14px;
       cursor: pointer;
       border-radius: 0;
       transition: border-color 0.2s, color 0.2s;
     }
-    .dev-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+    .dev-btn:hover { border-color: var(--accent); color: var(--text); }
     .dev-step-label {
       font-size: 9px;
       letter-spacing: 0.12em;
@@ -1176,7 +1177,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('visible')); return; }
       const obs = new IntersectionObserver((entries) => {
         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-      }, { threshold: 0.12 });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
       els.forEach(e => obs.observe(e));
     }
 

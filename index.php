@@ -66,7 +66,7 @@
       background-position: center top;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
+      justify-content: center;
       padding-bottom: 80px;
       position: relative;
     }
@@ -81,20 +81,20 @@
     .hero-logo {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 11px;
-      letter-spacing: 0.28em;
+      font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+      letter-spacing: 0.38em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: #c8c0b4;
       margin-bottom: 6px;
     }
 
     .hero-tagline {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 11px;
+      font-size: clamp(0.7rem, 1.2vw, 0.8rem);
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--deep);
+      color: #7a7470;
       margin-bottom: 56px;
     }
 
@@ -102,15 +102,15 @@
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
       font-style: italic;
-      font-size: 60px;
+      font-size: clamp(2.2rem, 5vw, 3.75rem);
       line-height: 1.1;
       color: var(--text);
       margin-bottom: 28px;
     }
 
     .hero-subheadline {
-      font-size: 16px;
-      color: var(--muted);
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      color: #9a9288;
       max-width: 480px;
       margin: 0 auto 40px;
       line-height: 1.8;
@@ -120,7 +120,7 @@
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: #7a7470;
       margin-bottom: 32px;
     }
 
@@ -233,7 +233,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
       font-style: italic;
-      font-size: 36px;
+      font-size: clamp(1.6rem, 3vw, 2.25rem);
       line-height: 1.3;
       color: #ddd6cc;
       margin-bottom: 32px;
@@ -241,7 +241,7 @@
 
     .section-body {
       font-size: 16px;
-      color: #5a5650;
+      color: #7a7470;
       line-height: 1.85;
       max-width: 560px;
     }
@@ -335,6 +335,7 @@
       opacity: 1;
       transform: translateY(0);
     }
+    .no-js .scroll-fade { opacity: 1; transform: none; }
 
     /* ────────────────────────────────────────────
        FOOTER
@@ -554,7 +555,7 @@
               obs.unobserve(e.target);
             }
           });
-        }, { threshold: 0.12 });
+        }, { threshold: 0.12, rootMargin: '0px 0px -20px 0px' });
 
         scrollEls.forEach(function(el) { obs.observe(el); });
       } else {
