@@ -1,4 +1,8 @@
-<?php require_once 'config.php'; ?>
+<?php
+require_once 'config.php';
+// DEV MODE — remove before launch
+$devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -145,10 +149,10 @@
 
     .big-quote {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 300;
       font-style: italic;
-      color: var(--text);
+      color: #ddd6cc;
       line-height: 1.4;
       max-width: 600px;
       margin: 0 auto 24px;
@@ -176,8 +180,8 @@
     }
 
     .t-body {
-      font-size: 15px;
-      color: var(--muted);
+      font-size: 18px;
+      color: #ddd6cc;
       max-width: 560px;
       margin: 0 auto 40px;
       line-height: 1.85;
@@ -213,7 +217,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 26px;
       font-weight: 300;
-      color: var(--text);
+      color: #ddd6cc;
       line-height: 1.5;
       max-width: 560px;
       margin-bottom: 12px;
@@ -232,18 +236,18 @@
     }
 
     textarea.q-input {
-      background: var(--surface);
+      background: #201f1c;
       border: 1px solid var(--border);
-      color: var(--text);
+      color: #ddd6cc;
       font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 300;
-      padding: 16px;
+      padding: 18px;
       border-radius: 0;
       outline: none;
       resize: none;
       width: 100%;
-      min-height: 120px;
+      min-height: 140px;
       line-height: 1.8;
       caret-color: var(--accent);
       transition: border-color 0.25s ease;
@@ -369,7 +373,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 28px;
       font-weight: 300;
-      color: var(--text);
+      color: #ddd6cc;
       line-height: 1.3;
       margin-bottom: 28px;
     }
@@ -425,10 +429,10 @@
 
     .closing-question {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 300;
       font-style: italic;
-      color: var(--text);
+      color: #ddd6cc;
       line-height: 1.45;
     }
 
@@ -556,16 +560,64 @@
 
     @media (max-width: 640px) {
       .screen { padding: 70px 20px 70px; }
-      .big-quote { font-size: 24px; }
+      .big-quote { font-size: 26px; }
       .q-text { font-size: 20px; }
       .pattern-text { font-size: 18px; }
-      .closing-question { font-size: 24px; }
+      .closing-question { font-size: 26px; }
+      .t-body { font-size: 16px; }
+    }
+
+    /* ════ DEV NAV (dev mode only) ════ */
+    #dev-nav {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    #dev-nav.active { display: flex; }
+    .dev-label {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--deep);
+      margin-bottom: 4px;
+      text-align: right;
+    }
+    .dev-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .dev-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 0;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .dev-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+    .dev-step-label {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: var(--deep);
+      text-align: right;
     }
   </style>
 </head>
 <body
   id="app"
   data-calendly="<?php echo defined('CALENDLY_LINK') ? htmlspecialchars(CALENDLY_LINK) : '#'; ?>"
+  data-dev="<?php echo $devMode ? '1' : '0'; ?>"
 >
 
   <div id="progress-wrap"><div id="progress-fill"></div></div>
@@ -807,6 +859,16 @@
   <!-- Toast -->
   <div id="toast">Link copied</div>
 
+  <!-- Dev nav (dev mode only) -->
+  <div id="dev-nav">
+    <div class="dev-label">Dev Preview</div>
+    <div class="dev-btns">
+      <button class="dev-btn" onclick="devPrev()">← Prev</button>
+      <button class="dev-btn" onclick="devNext()">Next →</button>
+    </div>
+    <div class="dev-step-label" id="dev-step-label">—</div>
+  </div>
+
   <!-- ══════════════════════════════════════
        JAVASCRIPT
   ═══════════════════════════════════════ -->
@@ -815,9 +877,20 @@
 
     /* ── Session ─────────────────────────── */
     const params    = new URLSearchParams(window.location.search);
+    const devMode   = document.getElementById('app').dataset.dev === '1';
     let sessionId   = params.get('session_id') || sessionStorage.getItem('session_id');
     let userEmail   = params.get('email')      || sessionStorage.getItem('user_email') || '';
     const CALENDLY  = document.getElementById('app').dataset.calendly || '#';
+
+    if (devMode) {
+      sessionId = 'dev_session_001';
+      userEmail = 'dev@test.com';
+      sessionStorage.setItem('session_id', sessionId);
+      sessionStorage.setItem('user_email', userEmail);
+      document.getElementById('dev-nav').classList.add('active');
+      initDevMode();
+      return;
+    }
 
     if (!sessionId) { show('screen-gate'); return; }
     sessionStorage.setItem('session_id', sessionId);
@@ -1147,6 +1220,156 @@
     setProgress(0);
 
   })();
+
+  /* ════════════════════════════════════════
+     DEV MODE — preview all screens
+  ════════════════════════════════════════ */
+  var _devStepIdx = 0;
+
+  var _devSteps = [
+    { label: 'Opening',         fn: function() { _devShow('screen-opening'); _devProgress(0); } },
+    { label: 'Q1 — Phase 1',    fn: function() { _devShowQ(1, 1, 'If you had to describe where you are in your life right now in three words — not how you want to be, just honestly where you are — what would those three words be?', 'The first words that come — not the considered ones.'); } },
+    { label: 'Q5 — Phase 1',    fn: function() { _devShowQ(5, 1, 'What\'s something you\'ve wanted for a long time that you haven\'t allowed yourself to fully pursue?', 'Something real that you\'ve been circling without landing on.'); } },
+    { label: 'Q10 — Phase 1',   fn: function() { _devShowQ(10, 1, 'What do people close to you say about you — the things they notice that you sometimes wish they didn\'t?', 'The observation that lands even when you wish it didn\'t.'); } },
+    { label: 'T12 Quote',       fn: function() { _devShow('screen-t12-quote'); _devProgress(10); } },
+    { label: 'T12 Text',        fn: function() { _devShow('screen-t12-text'); } },
+    { label: 'Loading P2',      fn: function() { _devShow('screen-load-p2'); } },
+    { label: 'Q11 — Phase 2',   fn: function() { _devShowQ(11, 2, 'When you describe your relationship with money, what feeling comes before any thought about numbers?', null); } },
+    { label: 'Q14 — Phase 2',   fn: function() { _devShowQ(14, 2, 'Think about a time you stepped back from something you wanted. What did that feel like in your body — before you found the reason?', null); } },
+    { label: 'Q16 — Phase 2',   fn: function() { _devShowQ(16, 2, 'If there were no external obstacles — no money, time, or other people involved — what would you change first?', null); } },
+    { label: 'T23 Quote',       fn: function() { _devShow('screen-t23-quote'); _devProgress(16); } },
+    { label: 'T23 Text',        fn: function() { _devShow('screen-t23-text'); } },
+    { label: 'Loading P3',      fn: function() { _devShow('screen-load-p3'); } },
+    { label: 'Q17 — Phase 3',   fn: function() { _devShowQ(17, 3, 'What would it mean about you if you failed at the thing you want most?', null); } },
+    { label: 'Q20 — Phase 3',   fn: function() { _devShowQ(20, 3, 'If the person you were at 12 could see how you live now, what would surprise them most?', null); } },
+    { label: 'Pre-report Quote', fn: function() { _devShow('screen-pre-quote'); _devProgress(20); } },
+    { label: 'Pre-report Text',  fn: function() { _devShow('screen-pre-text'); } },
+    { label: 'Loading Report',   fn: function() { _devShow('screen-load-report'); } },
+    { label: 'Report',           fn: function() {
+        _devRenderReport();
+        _devShow('screen-report');
+        var els = document.querySelectorAll('.rs');
+        if ('IntersectionObserver' in window) {
+          var obs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+          }, { threshold: 0.12 });
+          els.forEach(function(e) { obs.observe(e); });
+        } else {
+          els.forEach(function(e) { e.classList.add('visible'); });
+        }
+      }
+    }
+  ];
+
+  function _devShow(id) {
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    var el = document.getElementById(id);
+    if (el) el.classList.add('active');
+    window.scrollTo(0, 0);
+    document.getElementById('fixed-logo').classList.add('visible');
+  }
+
+  function _devProgress(n) {
+    document.getElementById('progress-fill').style.width = Math.round((n / 20) * 100) + '%';
+  }
+
+  function _devShowQ(num, ph, text, hint) {
+    document.getElementById('q-number').textContent = 'Question ' + num + ' of 20';
+    document.getElementById('q-text').textContent   = text;
+    var hintEl = document.getElementById('q-hint');
+    if (hint && ph === 1) {
+      hintEl.textContent   = hint;
+      hintEl.style.display = 'block';
+    } else {
+      hintEl.textContent   = '';
+      hintEl.style.display = 'none';
+    }
+    document.getElementById('q-input').value = '';
+    document.getElementById('btn-continue').disabled = false;
+    _devProgress(num - 1);
+    _devShow('screen-question');
+    document.getElementById('fixed-logo').classList.add('visible');
+  }
+
+  function _devRenderReport() {
+    var mockReport = {
+      pattern: 'Across your answers, a single thread surfaces with unusual consistency: you understand what you want, you can articulate it clearly, and then you arrange your life in ways that make it just out of reach. This is not avoidance of failure. It is the avoidance of being seen trying — and the specific consequence that would follow if you tried and succeeded.',
+      values: 'What you actually value, beneath what you say you want: integrity over performance. You want to do things that are real. The problem is that most of your current structures were built to look good rather than be good — and part of you knows it. The dissatisfaction you feel is not about having the wrong life. It\'s about performing a life you haven\'t fully chosen.',
+      beliefs: [
+        {
+          name: '"If I let people see what I actually want, they\'ll use it against me."',
+          where_it_shows_up: 'In your answer about where you feel most like yourself — the contrast between the public version and the private one is wide enough to be its own belief system. You perform competence in the spaces where you most want to be seen as real.',
+          identity_protecting: 'This belief was formed in an environment where visibility led to some form of exposure or control. It is protecting you from the feeling of being known and then dismissed — which, at some point, was a realistic risk.',
+          cost: 'The cost is that you have learned to want things quietly, which means pursuing them half-heartedly, which means not getting them, which confirms that wanting things leads nowhere. The belief is self-fulfilling.',
+          fundamental_shift: 'The shift is not to become more open. It is to notice that the people who have hurt you by knowing what you wanted are not the same as all people. The belief has overgeneralised from a real experience to a permanent rule.',
+          first_move: 'Tell one specific person — someone you already trust — one specific thing you actually want. Not a hope or a direction. A real want. Watch what happens. The data will matter more than the intention.'
+        },
+        {
+          name: '"I have to earn the right to rest."',
+          where_it_shows_up: 'Your description of the area where you feel most friction — and the pattern of effort not translating to progress — points here. You are working hard in the wrong direction because moving feels morally correct and stopping feels like failure.',
+          identity_protecting: 'This belief is protecting a sense of self-worth that was built around productivity. At some point, your value as a person became tied to your output. Rest became a withdrawal from the contract.',
+          cost: 'The cost is exhaustion as an identity. You are not tired because of your workload. You are tired because you have been trying to earn something that cannot be earned — approval from an internal judge who moves the goalposts.',
+          fundamental_shift: 'The shift is to separate your worth from your output. Not as a concept you agree with — you already agree with it. As a practice: to stop, before you have "earned" it, and observe that nothing bad happens.',
+          first_move: 'Take one hour this week where you do nothing that counts as productive. Do not justify it afterward. Simply let it have happened. Notice the discomfort and do not fix it.'
+        }
+      ],
+      goal_insight: 'What you describe wanting — more freedom, more alignment, a life that feels chosen — is not actually far from where you are. The distance is not structural. You are not missing resources, relationships, or opportunity. What you are missing is permission — specifically, the belief that you are allowed to have the thing you want without first becoming someone who deserves it.',
+      closing_question: 'What would you do differently this week if you genuinely believed that you were already enough?'
+    };
+
+    document.getElementById('r-pattern').innerHTML = mockReport.pattern;
+    document.getElementById('r-values').innerHTML  = mockReport.values;
+    document.getElementById('r-goal').innerHTML    = mockReport.goal_insight;
+    document.getElementById('r-closing').innerHTML = mockReport.closing_question;
+
+    var container = document.getElementById('r-beliefs-container');
+    container.innerHTML = '';
+    mockReport.beliefs.forEach(function(b) {
+      var card = document.createElement('div');
+      card.className = 'belief-card';
+      function bRow(label, text) {
+        return '<div class="belief-row"><div class="belief-row-label">' + label + '</div><div class="belief-body">' + (text || '') + '</div></div>';
+      }
+      card.innerHTML =
+        '<div class="belief-name">' + b.name + '</div>' +
+        bRow('Where it shows up',    b.where_it_shows_up) +
+        bRow("What it's protecting", b.identity_protecting) +
+        bRow("What it's costing you", b.cost) +
+        bRow('The shift',            b.fundamental_shift) +
+        bRow('First move',           b.first_move);
+      container.appendChild(card);
+    });
+
+    document.getElementById('cta-book').href = '#dev-calendly';
+  }
+
+  function _devUpdateLabel() {
+    var step = _devSteps[_devStepIdx];
+    document.getElementById('dev-step-label').textContent =
+      (_devStepIdx + 1) + ' / ' + _devSteps.length + ' — ' + step.label;
+  }
+
+  function initDevMode() {
+    _devStepIdx = 0;
+    _devSteps[0].fn();
+    _devUpdateLabel();
+  }
+
+  function devNext() {
+    if (_devStepIdx < _devSteps.length - 1) {
+      _devStepIdx++;
+      _devSteps[_devStepIdx].fn();
+      _devUpdateLabel();
+    }
+  }
+
+  function devPrev() {
+    if (_devStepIdx > 0) {
+      _devStepIdx--;
+      _devSteps[_devStepIdx].fn();
+      _devUpdateLabel();
+    }
+  }
   </script>
 </body>
 </html>

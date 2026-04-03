@@ -42,20 +42,10 @@
       from { opacity: 0; }
       to   { opacity: 1; }
     }
-
-    .fade-up { opacity: 0; animation: fadeUp 700ms ease forwards; }
-    .d-0  { animation-delay: 0ms; }
-    .d-1  { animation-delay: 180ms; }
-    .d-2  { animation-delay: 360ms; }
-    .d-3  { animation-delay: 540ms; }
-    .d-4  { animation-delay: 720ms; }
-    .d-5  { animation-delay: 900ms; }
-
-    /* ── Section base ── */
-    .section {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 80px 32px;
+    @keyframes scrollPulse {
+      0%   { opacity: 0.2; transform: translateY(0); }
+      60%  { opacity: 0.8; transform: translateY(6px); }
+      100% { opacity: 0.2; transform: translateY(0); }
     }
 
     /* ────────────────────────────────────────────
@@ -63,39 +53,32 @@
     ──────────────────────────────────────────── */
     .hero {
       min-height: 100vh;
+      background-image:
+        linear-gradient(
+          to bottom,
+          rgba(26,25,22,0.3)  0%,
+          rgba(26,25,22,0.6)  50%,
+          rgba(26,25,22,0.95) 85%,
+          rgba(26,25,22,1)    100%
+        ),
+        url('hero.jpg');
+      background-size: cover;
+      background-position: center top;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 80px 32px;
+      justify-content: flex-end;
+      padding-bottom: 80px;
       position: relative;
-    }
-
-    .hero-img-wrap {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      z-index: 0;
-    }
-
-    /* hero.jpg — save from: https://images.unsplash.com/photo-1620503374956-c942862f0372?w=1600&q=80 */
-    .hero-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      opacity: 0.12;
-      filter: grayscale(100%);
     }
 
     .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 580px;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 32px;
+      text-align: center;
     }
 
-    .wordmark {
+    .hero-logo {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       font-size: 11px;
@@ -105,31 +88,31 @@
       margin-bottom: 6px;
     }
 
-    .tagline-small {
+    .hero-tagline {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--deep);
-      margin-bottom: 72px;
+      margin-bottom: 56px;
     }
 
     .hero-headline {
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
       font-style: italic;
-      font-size: 52px;
-      line-height: 1.15;
+      font-size: 60px;
+      line-height: 1.1;
       color: var(--text);
       margin-bottom: 28px;
     }
 
-    .hero-sub {
+    .hero-subheadline {
       font-size: 16px;
       color: var(--muted);
-      max-width: 460px;
-      margin: 0 auto 48px;
+      max-width: 480px;
+      margin: 0 auto 40px;
       line-height: 1.8;
     }
 
@@ -141,14 +124,14 @@
       margin-bottom: 32px;
     }
 
-    .divider {
+    .hero-divider {
       width: 40px;
       height: 1px;
       background: var(--border);
-      margin: 0 auto 32px;
+      margin: 0 auto 28px;
     }
 
-    .price {
+    .hero-price {
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
       font-size: 22px;
@@ -174,9 +157,68 @@
     }
     .btn-hero:hover { background: var(--accent); color: var(--bg); }
 
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeIn 800ms ease 1200ms forwards;
+    }
+    .scroll-indicator-line {
+      width: 1px;
+      height: 32px;
+      background: var(--muted);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    .scroll-indicator-label {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Hero element animations */
+    .hero-logo     { opacity: 0; animation: fadeUp 700ms ease 0ms    forwards; }
+    .hero-tagline  { opacity: 0; animation: fadeUp 700ms ease 120ms  forwards; }
+    .hero-headline { opacity: 0; animation: fadeUp 700ms ease 280ms  forwards; }
+    .hero-subheadline { opacity: 0; animation: fadeUp 700ms ease 440ms forwards; }
+    .hero-details  { opacity: 0; animation: fadeUp 700ms ease 580ms  forwards; }
+    .hero-divider  { opacity: 0; animation: fadeIn 700ms ease 680ms  forwards; }
+    .hero-price    { opacity: 0; animation: fadeUp 700ms ease 720ms  forwards; }
+    .hero-cta      { opacity: 0; animation: fadeUp 700ms ease 860ms  forwards; }
+
     /* ────────────────────────────────────────────
-       SECTION 2 — The nature of belief
+       BELOW-FOLD SECTIONS
     ──────────────────────────────────────────── */
+    .content-section {
+      background: #1a1916;
+      padding: 96px 32px;
+    }
+
+    .content-section-inner {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .offer-section {
+      background: #201f1c;
+      padding: 96px 32px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .offer-section-inner {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
     .section-label {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
@@ -193,13 +235,13 @@
       font-style: italic;
       font-size: 36px;
       line-height: 1.3;
-      color: var(--text);
+      color: #ddd6cc;
       margin-bottom: 32px;
     }
 
     .section-body {
       font-size: 16px;
-      color: var(--muted);
+      color: #5a5650;
       line-height: 1.85;
       max-width: 560px;
     }
@@ -214,6 +256,75 @@
       margin: 56px 0;
     }
 
+    /* ── How-it-works feature rows ── */
+    .feature-rows {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 24px;
+      align-items: start;
+      padding: 28px 0 28px 20px;
+      border-left: 1px solid var(--accent-dim);
+      margin-bottom: 8px;
+    }
+
+    .feature-row-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 20px;
+      color: var(--accent);
+      line-height: 1.4;
+      padding-top: 2px;
+    }
+
+    .feature-row-body {}
+
+    .feature-row-title {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #ddd6cc;
+      margin-bottom: 8px;
+    }
+
+    .feature-row-text {
+      font-size: 15px;
+      color: #5a5650;
+      line-height: 1.8;
+    }
+
+    /* CTA note */
+    .cta-note {
+      font-size: 15px;
+      color: #5a5650;
+      max-width: 400px;
+      margin: 0 auto 40px;
+      line-height: 1.85;
+    }
+
+    .offer-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--border);
+      margin: 0 auto 28px;
+    }
+
+    .offer-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 22px;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
     /* scroll-triggered fade */
     .scroll-fade {
       opacity: 0;
@@ -226,70 +337,6 @@
     }
 
     /* ────────────────────────────────────────────
-       SECTION 3 — How it works
-    ──────────────────────────────────────────── */
-    .steps {
-      margin-top: 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-
-    .step {
-      display: grid;
-      grid-template-columns: 32px 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-
-    .step-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: 18px;
-      color: var(--accent);
-      line-height: 1.4;
-      padding-top: 2px;
-    }
-
-    .step-text {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    .step-text strong {
-      display: block;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      font-size: 13px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-
-    /* ────────────────────────────────────────────
-       SECTION 4 — Final CTA
-    ──────────────────────────────────────────── */
-    .cta-section {
-      text-align: center;
-      padding: 80px 32px;
-      border-top: 1px solid var(--border);
-    }
-
-    .cta-section .section-headline {
-      margin-bottom: 16px;
-    }
-
-    .cta-note {
-      font-size: 12px;
-      color: var(--muted);
-      max-width: 360px;
-      margin: 0 auto 48px;
-      line-height: 1.8;
-    }
-
-    /* ────────────────────────────────────────────
        FOOTER
     ──────────────────────────────────────────── */
     footer {
@@ -299,14 +346,20 @@
       font-size: 11px;
       color: var(--deep);
       letter-spacing: 0.06em;
+      background: #1a1916;
     }
 
-    @media (max-width: 640px) {
-      .hero-headline { font-size: 34px; }
-      .section-headline { font-size: 26px; }
-      .section { padding: 48px 20px; }
-      .hero { padding: 48px 20px; min-height: auto; padding-top: 80px; padding-bottom: 80px; }
-      .tagline-small { margin-bottom: 48px; }
+    /* ────────────────────────────────────────────
+       MOBILE
+    ──────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero-headline { font-size: 40px; }
+      .hero { padding-bottom: 64px; }
+      .hero-content { padding: 0 20px; }
+      .section-headline { font-size: 28px; }
+      .content-section { padding: 64px 20px; }
+      .offer-section { padding: 64px 20px; }
+      .hero-tagline { margin-bottom: 36px; }
     }
   </style>
 </head>
@@ -315,46 +368,49 @@
   <!-- ══════════════════════════════════════════
        SECTION 1 — HERO
   ═══════════════════════════════════════════ -->
-  <section class="hero">
-    <div class="hero-img-wrap">
-      <!-- Save hero.jpg from: https://images.unsplash.com/photo-1620503374956-c942862f0372?w=1600&q=80 -->
-      <img class="hero-img" src="hero.jpg" alt="" onerror="this.style.display='none'" />
-    </div>
+  <section class="hero" id="hero">
 
     <div class="hero-content">
-      <div class="wordmark fade-up d-0">Unbelieveme</div>
-      <div class="tagline-small fade-up d-0">Let go of what you think you know.</div>
+      <div class="hero-logo">Unbelieveme</div>
+      <div class="hero-tagline">Let go of what you think you know.</div>
 
-      <h1 class="hero-headline fade-up d-1">
+      <h1 class="hero-headline">
         Most people are living<br>someone else's beliefs.
       </h1>
 
-      <p class="hero-sub fade-up d-2">
+      <p class="hero-subheadline">
         A 25-minute assessment that surfaces the beliefs running your life —
         the ones you didn't choose, and the ones that are costing you.
       </p>
 
-      <div class="hero-details fade-up d-3">
+      <div class="hero-details">
         25 minutes &nbsp;·&nbsp; Personalised to your answers &nbsp;·&nbsp; Report delivered immediately
       </div>
 
-      <div class="divider fade-up d-3"></div>
+      <div class="hero-divider"></div>
 
-      <div class="price fade-up d-4">€36.90</div>
+      <div class="hero-price">€36.90</div>
 
-      <div class="fade-up d-4">
+      <div class="hero-cta">
         <a class="btn-hero" href="<?php echo defined('STRIPE_PAYMENT_LINK') ? htmlspecialchars(STRIPE_PAYMENT_LINK) : '#'; ?>">
           Begin the assessment →
         </a>
       </div>
     </div>
+
+    <div class="scroll-indicator" onclick="document.getElementById('section-belief').scrollIntoView({behavior:'smooth'})">
+      <div class="scroll-indicator-line"></div>
+      <div class="scroll-indicator-label">Scroll</div>
+    </div>
+
   </section>
 
   <!-- ══════════════════════════════════════════
        SECTION 2 — The nature of belief
   ═══════════════════════════════════════════ -->
-  <section>
-    <div class="section">
+  <section class="content-section" id="section-belief">
+    <div class="content-section-inner">
+
       <div class="section-label scroll-fade">What this is</div>
 
       <h2 class="section-headline scroll-fade">
@@ -377,44 +433,54 @@
         <p>What surfaces them is the pattern in your behaviour. The gap between what you say you want and what you actually do. The place where your story keeps going quiet.</p>
         <p>That's what this assessment reads.</p>
       </div>
+
     </div>
   </section>
 
   <!-- ══════════════════════════════════════════
        SECTION 3 — How the assessment works
   ═══════════════════════════════════════════ -->
-  <section style="border-top: 1px solid var(--border);">
-    <div class="section">
+  <section class="content-section" style="border-top: 1px solid var(--border);">
+    <div class="content-section-inner">
+
       <div class="section-label scroll-fade">How it works</div>
 
       <h2 class="section-headline scroll-fade">
         Three phases.<br>Twenty questions.<br>One mirror.
       </h2>
 
-      <div class="steps">
-        <div class="step scroll-fade">
-          <div class="step-num">I</div>
-          <div class="step-text">
-            <strong>Foundation — 10 questions</strong>
-            You describe your life as it is: where it flows, where it stalls, what you want, what you avoid. No interpretation yet — just what's true.
+      <div class="feature-rows">
+
+        <div class="feature-row scroll-fade">
+          <div class="feature-row-num">I</div>
+          <div class="feature-row-body">
+            <div class="feature-row-title">Foundation — 10 questions</div>
+            <div class="feature-row-text">
+              You describe your life as it is: where it flows, where it stalls, what you want, what you avoid. No interpretation yet — just what's true.
+            </div>
           </div>
         </div>
 
-        <div class="step scroll-fade">
-          <div class="step-num">II</div>
-          <div class="step-text">
-            <strong>Deepening — 6 personalised questions</strong>
-            Based on your answers, the assessment identifies the 2–3 areas of highest emotional charge and generates targeted questions for those areas only. These questions come from what you said — not from a template.
+        <div class="feature-row scroll-fade">
+          <div class="feature-row-num">II</div>
+          <div class="feature-row-body">
+            <div class="feature-row-title">Deepening — 6 personalised questions</div>
+            <div class="feature-row-text">
+              Based on your answers, the assessment identifies the 2–3 areas of highest emotional charge and generates targeted questions for those areas only. These questions come from what you said — not from a template.
+            </div>
           </div>
         </div>
 
-        <div class="step scroll-fade">
-          <div class="step-num">III</div>
-          <div class="step-text">
-            <strong>The core — 4 downward arrow questions</strong>
-            Following the most charged thread in your answers, these questions go toward the root — the identity-level conclusion underneath the pattern.
+        <div class="feature-row scroll-fade">
+          <div class="feature-row-num">III</div>
+          <div class="feature-row-body">
+            <div class="feature-row-title">The core — 4 downward arrow questions</div>
+            <div class="feature-row-text">
+              Following the most charged thread in your answers, these questions go toward the root — the identity-level conclusion underneath the pattern.
+            </div>
           </div>
         </div>
+
       </div>
 
       <div class="section-rule scroll-fade"></div>
@@ -426,33 +492,38 @@
         <p>For each belief: where it shows up in your answers, what it's protecting, what it's costing you, what a genuine shift would look like, and one concrete first move.</p>
         <p>The report is delivered on screen the moment it's ready, and sent to your email with a downloadable PDF.</p>
       </div>
+
     </div>
   </section>
 
   <!-- ══════════════════════════════════════════
        SECTION 4 — Final CTA
   ═══════════════════════════════════════════ -->
-  <section class="cta-section">
-    <div class="section-label scroll-fade">Begin</div>
+  <section class="offer-section">
+    <div class="offer-section-inner">
 
-    <h2 class="section-headline scroll-fade">
-      Twenty-five minutes.<br>Beliefs you've held for decades.
-    </h2>
+      <div class="section-label scroll-fade">Begin</div>
 
-    <p class="cta-note scroll-fade">
-      This is not a personality test. Not therapy. Not a course.<br>
-      It is a mirror — one that shows you what your behaviour<br>
-      has already been saying about what you believe.
-    </p>
+      <h2 class="section-headline scroll-fade">
+        Twenty-five minutes.<br>Beliefs you've held for decades.
+      </h2>
 
-    <div class="divider scroll-fade"></div>
+      <p class="cta-note scroll-fade">
+        This is not a personality test. Not therapy. Not a course.<br>
+        It is a mirror — one that shows you what your behaviour<br>
+        has already been saying about what you believe.
+      </p>
 
-    <div class="price scroll-fade">€36.90</div>
+      <div class="offer-divider scroll-fade"></div>
 
-    <div style="margin-top: 20px;" class="scroll-fade">
-      <a class="btn-hero" href="<?php echo defined('STRIPE_PAYMENT_LINK') ? htmlspecialchars(STRIPE_PAYMENT_LINK) : '#'; ?>">
-        Begin the assessment →
-      </a>
+      <div class="offer-price scroll-fade">€36.90</div>
+
+      <div class="scroll-fade" style="margin-top: 20px;">
+        <a class="btn-hero" href="<?php echo defined('STRIPE_PAYMENT_LINK') ? htmlspecialchars(STRIPE_PAYMENT_LINK) : '#'; ?>">
+          Begin the assessment →
+        </a>
+      </div>
+
     </div>
   </section>
 
@@ -464,21 +535,36 @@
   </footer>
 
   <script>
-    // Scroll-triggered fade for all .scroll-fade elements
-    const scrollEls = document.querySelectorAll('.scroll-fade');
-    if ('IntersectionObserver' in window) {
-      const obs = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            obs.unobserve(e.target);
-          }
+    // JS-driven IntersectionObserver: set opacity:0 on load, then fade in when visible
+    document.addEventListener('DOMContentLoaded', function() {
+      var scrollEls = document.querySelectorAll('.scroll-fade');
+
+      // Start invisible (JS-controlled, so no-JS users still see content)
+      scrollEls.forEach(function(el) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(14px)';
+      });
+
+      if ('IntersectionObserver' in window) {
+        var obs = new IntersectionObserver(function(entries) {
+          entries.forEach(function(e) {
+            if (e.isIntersecting) {
+              e.target.style.opacity = '1';
+              e.target.style.transform = 'translateY(0)';
+              obs.unobserve(e.target);
+            }
+          });
+        }, { threshold: 0.12 });
+
+        scrollEls.forEach(function(el) { obs.observe(el); });
+      } else {
+        scrollEls.forEach(function(el) {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
         });
-      }, { threshold: 0.12 });
-      scrollEls.forEach(el => obs.observe(el));
-    } else {
-      scrollEls.forEach(el => el.classList.add('visible'));
-    }
+      }
+    });
   </script>
+
 </body>
 </html>
