@@ -35,6 +35,9 @@ switch ($action) {
     case 'verify_stripe':
         handleVerifyStripe($input);
         break;
+    case 'test_email':
+        handleTestEmail($input);
+        break;
     default:
         http_response_code(400);
         echo json_encode(['error' => 'Unknown action']);
@@ -634,6 +637,30 @@ function generateRawAnswersPDF($answers, $sessionId) {
     }
 
     return $pdf->Output('S');
+}
+
+function handleTestEmail($input) {
+    $email = filter_var($input['email'] ?? '', FILTER_SANITIZE_EMAIL);
+    if (!$email) {
+        echo json_encode(['error' => 'Missing email']);
+        return;
+    }
+    $testReport = [
+        'pattern' => 'This is a test pattern.',
+        'values' => 'Test values.',
+        'beliefs' => [[
+            'name' => 'I am just testing',
+            'where_it_shows_up' => 'Everywhere.',
+            'identity_protecting' => 'Nothing.',
+            'cost' => 'Nothing.',
+            'fundamental_shift' => 'From: testing. To: done.',
+            'first_move' => 'Check your inbox.',
+        ]],
+        'goal_insight' => 'Test goal insight.',
+        'closing_question' => 'Did the email arrive?',
+    ];
+    sendReportEmail($email, $testReport, [], 'test_session');
+    echo json_encode(['ok' => true, 'check' => DATA_DIR . '/email_log.txt']);
 }
 
 function generateMinimalPDF($message) {
