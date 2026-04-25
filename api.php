@@ -438,8 +438,19 @@ function sendReportEmail($email, $report, $answers, $sessionId) {
     ]);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
-    curl_exec($ch);
+    $brevoResponse = curl_exec($ch);
+    $brevoCode     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr       = curl_error($ch);
     curl_close($ch);
+
+    $logPath  = DATA_DIR . '/email_log.txt';
+    $logEntry = date('c')
+        . ' | to:'       . $email
+        . ' | http:'     . $brevoCode
+        . ' | curl_err:' . $curlErr
+        . ' | response:' . $brevoResponse
+        . "\n";
+    @file_put_contents($logPath, $logEntry, FILE_APPEND);
 }
 
 function buildReportEmailHTML($report) {

@@ -31,7 +31,8 @@
       font-weight: 300;
       font-size: clamp(1rem, 1.5vw, 1.15rem);
       line-height: 1.8;
-      -webkit-font-smoothing: antialiased;
+      -webkit-font-smoothing: subpixel-antialiased;
+      -moz-osx-font-smoothing: auto;
     }
 
     @keyframes fadeUp {
@@ -84,7 +85,7 @@
       font-size: clamp(0.75rem, 1.5vw, 0.875rem);
       letter-spacing: 0.38em;
       text-transform: uppercase;
-      color: #c8c0b4;
+      color: #ddd6cc;
       margin-bottom: 6px;
     }
 
@@ -94,7 +95,7 @@
       font-size: clamp(0.7rem, 1.2vw, 0.8rem);
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: #7a7470;
+      color: #9a9288;
       margin-bottom: 56px;
     }
 
@@ -110,7 +111,7 @@
 
     .hero-subheadline {
       font-size: clamp(1rem, 1.8vw, 1.15rem);
-      color: #b8b0a4;
+      color: #c8c0b4;
       max-width: 480px;
       margin: 0 auto 40px;
       line-height: 1.8;
@@ -120,7 +121,7 @@
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: #7a7470;
+      color: #8a8278;
       margin-bottom: 32px;
     }
 
@@ -181,7 +182,7 @@
       font-size: 9px;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: #7a7470;
     }
 
     /* Hero element animations */
@@ -246,7 +247,7 @@
       max-width: 560px;
     }
 
-    .section-body p { margin-bottom: 20px; }
+    .section-body p { margin-bottom: 20px; color: #c8c0b4; }
     .section-body p:last-child { margin-bottom: 0; }
 
     .section-rule {
@@ -345,7 +346,7 @@
       padding: 28px 32px;
       text-align: center;
       font-size: 11px;
-      color: var(--deep);
+      color: #5a5650;
       letter-spacing: 0.06em;
       background: #1a1916;
     }
@@ -354,10 +355,10 @@
        MOBILE
     ──────────────────────────────────────────── */
     @media (max-width: 768px) {
-      .hero-headline { font-size: 40px; }
+      .hero-headline { font-size: 2.2rem; }
       .hero { padding-bottom: 64px; }
       .hero-content { padding: 0 20px; }
-      .section-headline { font-size: 28px; }
+      .section-headline { font-size: 1.8rem; }
       .content-section { padding: 64px 20px; }
       .offer-section { padding: 64px 20px; }
       .hero-tagline { margin-bottom: 36px; }

@@ -34,7 +34,8 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-weight: 300;
       font-size: clamp(1rem, 1.5vw, 1.15rem);
       line-height: 1.8;
-      -webkit-font-smoothing: antialiased;
+      -webkit-font-smoothing: subpixel-antialiased;
+      -moz-osx-font-smoothing: auto;
       overflow-x: hidden;
     }
 
@@ -83,7 +84,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-size: 10px;
       letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: #8a8278;
       z-index: 100;
       opacity: 0;
       transition: opacity 0.6s ease;
@@ -152,7 +153,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-size: clamp(1.8rem, 3.5vw, 2.6rem);
       font-weight: 300;
       font-style: italic;
-      color: #ddd6cc;
+      color: #f0ece6;
       line-height: 1.4;
       max-width: 600px;
       margin: 0 auto 24px;
@@ -181,15 +182,15 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
 
     .t-body {
       font-size: clamp(1.1rem, 2vw, 1.3rem);
-      color: #e8e2d8;
+      color: #f0ece6;
       max-width: 560px;
       margin: 0 auto 40px;
       line-height: 1.85;
       opacity: 0;
       animation: fadeUp 700ms ease 0ms forwards;
     }
-    .t-body p { margin-bottom: 18px; }
-    .t-body p { color: #e8e2d8 !important; font-size: clamp(1rem, 1.8vw, 1.1rem); }
+    .t-body p { margin-bottom: 18px; color: #f0ece6; }
+    .t-body p { color: #f0ece6 !important; font-size: clamp(1rem, 1.8vw, 1.1rem); }
     .t-body p:last-child { margin-bottom: 0; }
 
     .t-btn-wrap {
@@ -219,7 +220,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(1.4rem, 2.8vw, 1.9rem);
       font-weight: 300;
-      color: #ddd6cc;
+      color: #f0ece6;
       line-height: 1.5;
       max-width: 560px;
       margin-bottom: 12px;
@@ -260,7 +261,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
 
     .q-kbd {
       font-size: 10px;
-      color: var(--deep);
+      color: #5a5650;
       letter-spacing: 0.08em;
       margin-bottom: 20px;
       font-style: italic;
@@ -305,7 +306,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: #8a8278;
       opacity: 0;
       animation: fadeIn 600ms ease 400ms forwards;
     }
@@ -324,7 +325,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-size: 10px;
       letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: #8a8278;
       text-align: center;
       margin-bottom: 72px;
     }
@@ -352,7 +353,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-weight: 300;
       font-style: italic;
       font-size: clamp(1.2rem, 2.2vw, 1.6rem);
-      color: #e8e2d8;
+      color: #f0ece6;
       line-height: 1.6;
     }
 
@@ -375,7 +376,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(1.5rem, 2.8vw, 2rem);
       font-weight: 300;
-      color: #ddd6cc;
+      color: #f0ece6;
       line-height: 1.3;
       margin-bottom: 28px;
     }
@@ -434,7 +435,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-size: clamp(1.6rem, 3vw, 2.2rem);
       font-weight: 300;
       font-style: italic;
-      color: #ddd6cc;
+      color: #f0ece6;
       line-height: 1.45;
     }
 
@@ -493,7 +494,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
 
     .email-note {
       font-size: 11px;
-      color: var(--muted);
+      color: #8a8278;
       text-align: center;
       margin-bottom: 56px;
     }
@@ -513,7 +514,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       max-width: 560px;
       line-height: 1.85;
     }
-    .what-to-do-body p { margin-bottom: 18px; }
+    .what-to-do-body p { margin-bottom: 18px; color: #c8c0b4; }
     .what-to-do-body p:last-child { margin-bottom: 0; }
 
     .report-footer {
@@ -588,7 +589,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       font-size: 9px;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #ffffff;
+      color: #c8c0b4;
       margin-bottom: 4px;
       text-align: right;
     }
@@ -902,12 +903,16 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       sessionStorage.setItem('session_id', sessionId);
       sessionStorage.setItem('user_email', userEmail);
       document.getElementById('dev-nav').classList.add('active');
-      // initDevMode called after _devSteps defined — see bottom of script
+      setTimeout(function() {
+        if (typeof _devSteps !== 'undefined' && typeof initDevMode === 'function') {
+          initDevMode();
+        }
+      }, 50);
+      return;
     }
 
-    // PAYWALL DISABLED FOR DEVELOPMENT — re-enable before launch
-    // if (!sessionId) { show('screen-gate'); return; }
-    if (!sessionId) { sessionId = 'dev_open_' + Date.now(); }
+    // PAYWALL DISABLED FOR DEV — re-enable before launch
+    if (!sessionId) { sessionId = 'open_' + Date.now(); sessionStorage.setItem('session_id', sessionId); }
     sessionStorage.setItem('session_id', sessionId);
     if (userEmail) sessionStorage.setItem('user_email', userEmail);
 
