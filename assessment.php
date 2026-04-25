@@ -87,6 +87,8 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       color: #8a8278;
       z-index: 100;
       opacity: 0;
+      background: rgba(26,25,22,0.92);
+      padding: 4px 16px;
       transition: opacity 0.6s ease;
       pointer-events: none;
     }
@@ -192,6 +194,17 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     .t-body p { margin-bottom: 18px; color: #f0ece6; }
     .t-body p { color: #f0ece6 !important; font-size: clamp(1rem, 1.8vw, 1.1rem); }
     .t-body p:last-child { margin-bottom: 0; }
+
+    .t-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 300;
+      color: #f0ece6;
+      line-height: 1.3;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 700ms ease 0ms forwards;
+    }
 
     .t-btn-wrap {
       text-align: center;
@@ -517,6 +530,52 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     .what-to-do-body p { margin-bottom: 18px; color: #c8c0b4; }
     .what-to-do-body p:last-child { margin-bottom: 0; }
 
+    .belief-sequence {
+      margin: 32px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+    .belief-sequence-step {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+      font-weight: 300;
+      color: #f0ece6;
+      padding: 14px 24px;
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 360px;
+    }
+    .belief-sequence-arrow {
+      font-size: 1.2rem;
+      color: var(--accent);
+      padding: 6px 24px;
+      line-height: 1;
+    }
+
+    .shift-from, .shift-to {
+      padding: 16px 20px;
+      margin-bottom: 8px;
+      border-left: 2px solid var(--accent-dim);
+      color: #c8c0b4;
+      font-size: clamp(0.9rem, 1.6vw, 1rem);
+      line-height: 1.8;
+    }
+    .shift-to {
+      border-left-color: var(--accent);
+      color: #f0ece6;
+    }
+    .shift-label {
+      display: block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
     .report-footer {
       font-size: 10px;
       color: var(--deep);
@@ -649,6 +708,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     <div class="quote-screen">
       <blockquote class="big-quote">"It ain't what you don't know that gets you into trouble. It's what you know for sure that just ain't so."</blockquote>
       <cite class="big-cite">— Mark Twain</cite>
+      <div style="margin-top:40px;"><button class="btn" id="btn-opening">Continue →</button></div>
     </div>
   </div>
 
@@ -696,6 +756,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     <div class="quote-screen">
       <blockquote class="big-quote">"We don't see things as they are. We see them as we are."</blockquote>
       <cite class="big-cite">— Anaïs Nin</cite>
+      <div style="margin-top:40px;"><button class="btn" id="btn-q1">Continue →</button></div>
     </div>
   </div>
 
@@ -704,6 +765,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
   ═══════════════════════════════════════ -->
   <div class="screen" id="screen-t12-text">
     <div class="t-inner">
+      <div class="t-title">Your filter is not neutral.</div>
       <div class="t-body">
         <p>You've just described your life — where it feels stuck, where it flows, what you want, what you avoid.</p>
         <p>A belief isn't just a thought you have. It's a filter through which all experience passes. Your brain selects what to notice based on what it already believes to be true. If you believe 'I have to earn my place,' it will gather evidence for that belief continuously, automatically, and without your permission. It will filter out — literally not register — the moments that contradict it.</p>
@@ -734,6 +796,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     <div class="quote-screen">
       <blockquote class="big-quote">"Until you make the unconscious conscious, it will direct your life and you will call it fate."</blockquote>
       <cite class="big-cite">— Carl Jung</cite>
+      <div style="margin-top:40px;"><button class="btn" id="btn-q2">Continue →</button></div>
     </div>
   </div>
 
@@ -742,6 +805,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
   ═══════════════════════════════════════ -->
   <div class="screen" id="screen-t23-text">
     <div class="t-inner">
+      <div class="t-title">Something specific surfaced.</div>
       <div class="t-body">
         <p>Something specific appeared in what you just shared. A pattern. A feeling that kept returning in different forms.</p>
         <p>The next questions follow that thread directly. They are generated from your answers — not random.</p>
@@ -771,7 +835,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
   <div class="screen" id="screen-pre-quote">
     <div class="quote-screen">
       <blockquote class="big-quote">"The cave you fear to enter holds the treasure you seek."</blockquote>
-      <cite class="big-cite">— Carl Jung</cite>
+      <cite class="big-cite">— Joseph Campbell</cite>
     </div>
   </div>
 
@@ -780,6 +844,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
   ═══════════════════════════════════════ -->
   <div class="screen" id="screen-pre-text">
     <div class="t-inner" style="text-align:center;">
+      <div class="t-title">Reading what you wrote.</div>
       <div class="t-body" style="text-align:center;">
         <p>Your answers are being read carefully now.</p>
         <p>Not to judge. Not to diagnose.</p>
@@ -840,7 +905,15 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
           <p>Awareness is the first step. But awareness without direction fades.</p>
           <p>Beliefs don't change through thinking. They change through experience.</p>
           <p>You cannot argue yourself out of a belief that feels like fact. The only thing that changes a belief is a new experience that contradicts it — followed by the reflection that integrates what that experience meant.</p>
-          <p>The structure is always: New behaviour → New experience → Reflection → Belief update.</p>
+          <div class="belief-sequence">
+            <div class="belief-sequence-step">New behaviour</div>
+            <div class="belief-sequence-arrow">↓</div>
+            <div class="belief-sequence-step">New experience</div>
+            <div class="belief-sequence-arrow">↓</div>
+            <div class="belief-sequence-step">Reflection</div>
+            <div class="belief-sequence-arrow">↓</div>
+            <div class="belief-sequence-step">Belief update</div>
+          </div>
           <p>This is why the first move for each belief matters more than any insight in this report. The insight shows you the belief. The behaviour begins to change it.</p>
           <p>One more thing: beliefs become identity. 'I am someone who struggles with money.' 'I am someone who doesn't finish things.' When a belief becomes identity, changing it feels like self-erasure. That's why the shift described for each belief isn't a new thought — it's a new way of being. Built one action at a time.</p>
         </div>
@@ -1073,12 +1146,12 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     /* ── Quote → text auto-transitions ───── */
     function showT12Quote() {
       show('screen-t12-quote');
-      setTimeout(() => show('screen-t12-text'), 4000);
+      document.getElementById('btn-q1').onclick = () => show('screen-t12-text');
     }
 
     function showT23Quote() {
       show('screen-t23-quote');
-      setTimeout(() => show('screen-t23-text'), 4000);
+      document.getElementById('btn-q2').onclick = () => show('screen-t23-text');
     }
 
     function showPreQuote() {
@@ -1184,9 +1257,18 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     }
 
     function bRow(label, text) {
+      var content = esc(text || '');
+      if (label === 'The shift' && text) {
+        var fromMatch = text.match(/From:\s*(.+?)(?=\s*To:|$)/is);
+        var toMatch   = text.match(/To:\s*(.+?)(?=\s*$)/is);
+        if (fromMatch && toMatch) {
+          content = '<div class="shift-from"><span class="shift-label">From</span>' + esc(fromMatch[1].trim()) + '</div>' +
+                    '<div class="shift-to"><span class="shift-label">To</span>' + esc(toMatch[1].trim()) + '</div>';
+        }
+      }
       return '<div class="belief-row">' +
-        '<div class="belief-row-label">' + esc(label)      + '</div>' +
-        '<div class="belief-body">'      + esc(text || '') + '</div>' +
+        '<div class="belief-row-label">' + esc(label) + '</div>' +
+        '<div class="belief-body">' + content + '</div>' +
         '</div>';
     }
 
@@ -1238,7 +1320,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     /* ── Init ────────────────────────────── */
     show('screen-opening-quote');
     setProgress(0);
-    setTimeout(() => show('screen-opening'), 4000);
+    document.getElementById('btn-opening').onclick = () => show('screen-opening');
 
   })();
 

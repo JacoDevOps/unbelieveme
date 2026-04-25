@@ -377,7 +377,7 @@
       <div class="hero-tagline">Let go of what you think you know.</div>
 
       <h1 class="hero-headline">
-        Most people are living<br>someone else's beliefs.
+        What you believe<br>shapes your life.<br><em>What are you shaping?</em>
       </h1>
 
       <p class="hero-subheadline">
@@ -543,6 +543,7 @@
 
       // Start invisible (JS-controlled, so no-JS users still see content)
       scrollEls.forEach(function(el) {
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         el.style.opacity = '0';
         el.style.transform = 'translateY(14px)';
       });
@@ -556,7 +557,7 @@
               obs.unobserve(e.target);
             }
           });
-        }, { threshold: 0.12, rootMargin: '0px 0px -20px 0px' });
+        }, { threshold: 0.05, rootMargin: '0px 0px 0px 0px' });
 
         scrollEls.forEach(function(el) { obs.observe(el); });
       } else {

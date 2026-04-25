@@ -499,97 +499,100 @@ function buildReportEmailHTML($report) {
 
 function generateReportPDF($report) {
     $fpdfPath = __DIR__ . '/vendor/fpdf/fpdf.php';
-
-    if (file_exists($fpdfPath)) {
-        require_once $fpdfPath;
-    }
-
-    if (!class_exists('FPDF')) {
-        return generateMinimalPDF('Unbelieveme Belief Report — install FPDF library to vendor/fpdf/fpdf.php for full PDF output.');
-    }
+    if (file_exists($fpdfPath)) require_once $fpdfPath;
+    if (!class_exists('FPDF')) return generateHTMLReportAsPDF($report);
 
     $pdf = new FPDF();
     $pdf->AddPage();
-    $pdf->SetMargins(20, 20, 20);
+    $pdf->SetMargins(24, 24, 24);
+    $pdf->SetAutoPageBreak(true, 24);
+    $w = 170;
 
-    // Title
-    $pdf->SetFont('Helvetica', 'B', 20);
-    $pdf->SetTextColor(184, 160, 112);
-    $pdf->Cell(0, 14, 'UNBELIEVEME', 0, 1, 'C');
-    $pdf->SetFont('Helvetica', '', 12);
-    $pdf->SetTextColor(180, 175, 168);
-    $pdf->Cell(0, 8, 'Your Belief Report', 0, 1, 'C');
+    // Header
+    $pdf->SetFont('Helvetica', '', 8);
+    $pdf->SetTextColor(140, 130, 100);
+    $pdf->Cell($w, 6, 'UNBELIEVEME', 0, 1, 'C');
+    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetTextColor(160, 155, 148);
+    $pdf->Cell($w, 5, 'Your Belief Report', 0, 1, 'C');
     $pdf->Ln(10);
+    $pdf->SetDrawColor(60, 55, 48);
+    $pdf->Line(24, $pdf->GetY(), 186, $pdf->GetY());
+    $pdf->Ln(8);
+
+    // Helper: section label
+    $label = function($text) use ($pdf, $w) {
+        $pdf->SetFont('Helvetica', 'B', 7);
+        $pdf->SetTextColor(184, 160, 112);
+        $pdf->Cell($w, 5, strtoupper($text), 0, 1);
+        $pdf->Ln(1);
+    };
+
+    // Helper: body text
+    $body = function($text) use ($pdf, $w) {
+        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->SetTextColor(70, 65, 58);
+        $pdf->MultiCell($w, 6, $text);
+        $pdf->Ln(3);
+    };
 
     // Pattern
-    $pdf->SetFont('Helvetica', 'B', 14);
-    $pdf->SetTextColor(200, 150, 62);
-    $pdf->Cell(0, 10, 'What we found', 0, 1);
-    $pdf->SetFont('Helvetica', '', 11);
-    $pdf->SetTextColor(50, 50, 50);
-    $pdf->MultiCell(0, 7, $report['pattern'] ?? '');
-    $pdf->Ln(6);
+    $label('What we found');
+    $pdf->SetFont('Helvetica', 'I', 11);
+    $pdf->SetTextColor(50, 45, 38);
+    $pdf->MultiCell($w, 7, $report['pattern'] ?? '');
+    $pdf->Ln(4);
 
     // Values
-    $pdf->SetFont('Helvetica', 'B', 14);
-    $pdf->SetTextColor(200, 150, 62);
-    $pdf->Cell(0, 10, 'What you actually value', 0, 1);
-    $pdf->SetFont('Helvetica', '', 11);
-    $pdf->SetTextColor(50, 50, 50);
-    $pdf->MultiCell(0, 7, $report['values'] ?? '');
-    $pdf->Ln(6);
+    $label('What you actually value');
+    $body($report['values'] ?? '');
 
     // Beliefs
     foreach ($report['beliefs'] ?? [] as $belief) {
-        if ($pdf->GetY() > 220) $pdf->AddPage();
-
-        $pdf->SetFont('Helvetica', 'B', 14);
-        $pdf->SetTextColor(200, 150, 62);
-        $pdf->MultiCell(0, 8, $belief['name'] ?? '');
-        $pdf->SetFont('Helvetica', '', 10);
-        $pdf->SetTextColor(50, 50, 50);
-
-        $sections = [
-            'Where it shows up' => 'where_it_shows_up',
-            "What it's protecting" => 'identity_protecting',
-            "What it's costing you" => 'cost',
-            'The shift' => 'fundamental_shift',
-            'First move' => 'first_move',
-        ];
-
-        foreach ($sections as $label => $key) {
-            $pdf->SetFont('Helvetica', 'B', 10);
-            $pdf->SetTextColor(100, 100, 100);
-            $pdf->Cell(0, 6, $label, 0, 1);
-            $pdf->SetFont('Helvetica', '', 10);
-            $pdf->SetTextColor(50, 50, 50);
-            $pdf->MultiCell(0, 6, $belief[$key] ?? '');
-            $pdf->Ln(2);
-        }
+        if ($pdf->GetY() > 230) $pdf->AddPage();
         $pdf->Ln(4);
+        $pdf->SetDrawColor(120, 106, 72);
+        $pdf->Line(24, $pdf->GetY(), 186, $pdf->GetY());
+        $pdf->Ln(6);
+        $pdf->SetFont('Helvetica', 'I', 13);
+        $pdf->SetTextColor(40, 36, 28);
+        $pdf->MultiCell($w, 7, $belief['name'] ?? '');
+        $pdf->Ln(3);
+        foreach ([
+            'Where it shows up'    => 'where_it_shows_up',
+            "What it's protecting" => 'identity_protecting',
+            "What it's costing you"=> 'cost',
+            'The shift'            => 'fundamental_shift',
+            'First move'           => 'first_move',
+        ] as $lbl => $key) {
+            $label($lbl);
+            $body($belief[$key] ?? '');
+        }
     }
 
     // Goal insight
-    if ($pdf->GetY() > 220) $pdf->AddPage();
-    $pdf->SetFont('Helvetica', 'B', 14);
-    $pdf->SetTextColor(200, 150, 62);
-    $pdf->Cell(0, 10, 'Your goal', 0, 1);
-    $pdf->SetFont('Helvetica', '', 11);
-    $pdf->SetTextColor(50, 50, 50);
-    $pdf->MultiCell(0, 7, $report['goal_insight'] ?? '');
+    if ($pdf->GetY() > 230) $pdf->AddPage();
+    $pdf->Ln(4);
+    $pdf->SetDrawColor(60, 55, 48);
+    $pdf->Line(24, $pdf->GetY(), 186, $pdf->GetY());
     $pdf->Ln(6);
+    $label('Your goal');
+    $body($report['goal_insight'] ?? '');
 
     // Closing question
-    if ($pdf->GetY() > 220) $pdf->AddPage();
-    $pdf->SetFont('Helvetica', 'I', 14);
-    $pdf->SetTextColor(80, 80, 80);
-    $pdf->MultiCell(0, 8, $report['closing_question'] ?? '');
+    $pdf->Ln(4);
+    $pdf->SetFont('Helvetica', 'I', 12);
+    $pdf->SetTextColor(120, 106, 72);
+    $pdf->MultiCell($w, 7, $report['closing_question'] ?? '');
 
     // Footer
-    $pdf->Ln(10);
-    $pdf->SetFont('Helvetica', '', 9);
-    $pdf->SetTextColor(150, 150, 150);
-    $pdf->Cell(0, 6, '© Unbelieveme 2026 · quiz@unbelieveme.com', 0, 1, 'C');
+    $pdf->Ln(8);
+    $pdf->SetDrawColor(60, 55, 48);
+    $pdf->Line(24, $pdf->GetY(), 186, $pdf->GetY());
+    $pdf->Ln(4);
+    $pdf->SetFont('Helvetica', '', 8);
+    $pdf->SetTextColor(120, 115, 108);
+    $pdf->Cell($w, 5, iconv('UTF-8', 'windows-1252', '© Unbelieveme 2026 · quiz@unbelieveme.com'), 0, 1, 'C');
 
     return $pdf->Output('S');
 }
