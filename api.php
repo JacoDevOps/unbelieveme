@@ -500,7 +500,7 @@ function buildReportEmailHTML($report) {
 function generateReportPDF($report) {
     $fpdfPath = __DIR__ . '/vendor/fpdf/fpdf.php';
     if (file_exists($fpdfPath)) require_once $fpdfPath;
-    if (!class_exists('FPDF')) return generateHTMLReportAsPDF($report);
+    if (!class_exists('FPDF')) return generateMinimalPDF('Unbelieveme Belief Report — install FPDF library to vendor/fpdf/fpdf.php for full PDF output.');
 
     $pdf = new FPDF();
     $pdf->AddPage();
