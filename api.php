@@ -640,7 +640,7 @@ function generateRawAnswersPDF($answers, $sessionId) {
 }
 
 function handleTestEmail($input) {
-    $email = filter_var($input['email'] ?? '', FILTER_SANITIZE_EMAIL);
+    $email = filter_var($input['email'] ?? $_GET['email'] ?? '', FILTER_SANITIZE_EMAIL);
     if (!$email) {
         echo json_encode(['error' => 'Missing email']);
         return;
