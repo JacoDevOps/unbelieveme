@@ -677,6 +677,72 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       color: #c8c0b4;
       text-align: right;
     }
+
+    /* ════ PRINT ════ */
+    @media print {
+      /* Hide everything except the report */
+      #progress-wrap, #fixed-logo, #dev-nav, #toast, #err-banner,
+      #screen-gate, #screen-opening-quote, #screen-opening,
+      #screen-question, #screen-load-p2, #screen-load-p3,
+      #screen-t12-quote, #screen-t12-text,
+      #screen-t23-quote, #screen-t23-text,
+      #screen-pre-quote, #screen-pre-text, #screen-load-report,
+      #rs-ctas, .report-ctas, .email-note { display: none !important; }
+
+      /* Reset body + page */
+      body {
+        background: #f8f6f2 !important;
+        color: #2a2520 !important;
+        font-size: 11pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      /* Unfix the report screen so it flows normally */
+      #screen-report {
+        position: static !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        padding: 24pt 0 !important;
+        overflow: visible !important;
+      }
+
+      /* Make all fade-in sections fully visible */
+      .rs {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+
+      /* Colours adapted for warm paper */
+      .report-logo        { color: #8a8278 !important; }
+      .section-label      { color: #b8a070 !important; }
+      .pattern-text       { color: #2a2520 !important; }
+      .section-body,
+      .belief-body,
+      .what-to-do-body    { color: #4a4540 !important; }
+      .belief-name        { color: #1a1714 !important; }
+      .closing-question   { color: #2a2520 !important; }
+      .report-rule        { background: #d4cfc8 !important; }
+      .belief-card        { border-top-color: #b8a070 !important; }
+      .shift-from         { border-left-color: #b8a070 !important; color: #4a4540 !important; }
+      .shift-to           { border-left-color: #8a6a30 !important; color: #2a2520 !important; }
+      .belief-row-label   { color: #b8a070 !important; }
+      .closing-label      { color: #b8a070 !important; }
+      .closing-rule       { background: #d4cfc8 !important; }
+
+      /* Belief sequence on paper */
+      .belief-sequence-step { border-color: #d4cfc8 !important; color: #2a2520 !important; }
+      .belief-sequence-arrow { color: #b8a070 !important; }
+
+      /* Page break rules */
+      .belief-card        { page-break-inside: avoid; break-inside: avoid; }
+      .report-section     { page-break-inside: avoid; break-inside: avoid; }
+      .closing-moment     { page-break-before: auto; }
+
+      /* Inner width */
+      .inner { max-width: 100% !important; }
+    }
   </style>
 </head>
 <body
@@ -1284,7 +1350,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
 
     /* ── CTAs ────────────────────────────── */
     document.getElementById('cta-download').addEventListener('click', () => {
-      window.location.href = 'api.php?action=download_report&session_id=' + encodeURIComponent(sessionId);
+      window.print();
     });
 
     document.getElementById('cta-share').addEventListener('click', () => {

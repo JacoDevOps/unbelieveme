@@ -412,25 +412,6 @@ function sendReportEmail($email, $report, $answers, $sessionId) {
         'htmlContent' => $html,
     ];
 
-    // Attach PDFs only if FPDF is available — never crash if it isn't
-    $fpdfPath = __DIR__ . '/vendor/fpdf/fpdf.php';
-    if (file_exists($fpdfPath)) {
-        require_once $fpdfPath;
-    }
-
-    if (class_exists('FPDF')) {
-        try {
-            $reportPdf = generateReportPDF($report);
-            $rawPdf    = generateRawAnswersPDF($answers, $sessionId);
-            $payload['attachment'] = [
-                ['content' => base64_encode($reportPdf), 'name' => 'unbelieveme-report.pdf'],
-                ['content' => base64_encode($rawPdf),    'name' => 'unbelieveme-answers.pdf'],
-            ];
-        } catch (Exception $e) {
-            // PDF generation failed — send email without attachments
-        }
-    }
-
     $ch = curl_init('https://api.brevo.com/v3/smtp/email');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
