@@ -204,6 +204,8 @@ function handleGenerateReport($input) {
     $allAnswersText = formatAnswersForPrompt($answers, 1, 20);
 
     $systemPrompt = <<<EOT
+Detect the language of the user's answers. Write the entire report in that same language. If answers are in German, write in German. If in Spanish, write in Spanish. If in English, write in English. Never mix languages.
+
 You are a deeply insightful belief analyst. You have received someone's answers to a structured belief assessment. Your task is to generate a deeply personal report that shows them beliefs they did not know they held — inferred from their behaviour patterns, not from what they stated directly.
 
 CRITICAL RULES:

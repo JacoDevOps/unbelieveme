@@ -1,7 +1,9 @@
 <?php
 require_once 'config.php';
 // DEV MODE — remove before launch
-$devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
+$devMode  = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
+// TEST BYPASS — allows access without payment for testing
+$testMode = isset($_GET['dev']) && $_GET['dev'] === 'ubm_test_2026';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -106,6 +108,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       opacity: 0;
       pointer-events: none;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .screen.active {
       opacity: 1;
@@ -343,11 +346,11 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
       margin-bottom: 72px;
     }
 
-    /* IntersectionObserver fade-up */
+    /* Report section fade-up — animated on render, not on scroll */
     .rs {
-      opacity: 0.01;
-      transform: translateY(14px);
-      transition: opacity 0.65s ease, transform 0.65s ease;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
     }
     .rs.visible { opacity: 1; transform: translateY(0); }
 
@@ -749,6 +752,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
   id="app"
   data-calendly="<?php echo defined('CALENDLY_LINK') ? htmlspecialchars(CALENDLY_LINK) : '#'; ?>"
   data-dev="<?php echo $devMode ? '1' : '0'; ?>"
+  data-test="<?php echo $testMode ? '1' : '0'; ?>"
 >
 
   <div id="progress-wrap"><div id="progress-fill"></div></div>
@@ -1035,7 +1039,8 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
 
     /* ── Session ─────────────────────────── */
     const params    = new URLSearchParams(window.location.search);
-    const devMode   = document.getElementById('app').dataset.dev === '1';
+    const devMode   = document.getElementById('app').dataset.dev  === '1';
+    const testMode  = document.getElementById('app').dataset.test === '1';
     let sessionId   = params.get('session_id') || sessionStorage.getItem('session_id');
     let userEmail   = params.get('email')      || sessionStorage.getItem('user_email') || '';
     const CALENDLY  = document.getElementById('app').dataset.calendly || '#';
@@ -1052,6 +1057,12 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
         }
       }, 50);
       return;
+    }
+
+    // TEST BYPASS — ?dev=ubm_test_2026 skips payment check for testing
+    if (testMode && !sessionId) {
+      sessionId = 'test_' + Date.now();
+      sessionStorage.setItem('session_id', sessionId);
     }
 
     // PAYWALL DISABLED FOR DEV — re-enable before launch
@@ -1345,14 +1356,12 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
         '</div>';
     }
 
-    /* ── IntersectionObserver ────────────── */
+    /* ── Staggered report reveal (no scroll dependency) ── */
     function initIO() {
-      const els = document.querySelectorAll('.rs');
-      if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('visible')); return; }
-      const obs = new IntersectionObserver((entries) => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-      els.forEach(e => obs.observe(e));
+      const els = document.querySelectorAll('#screen-report .rs');
+      els.forEach((el, i) => {
+        setTimeout(() => el.classList.add('visible'), i * 120);
+      });
     }
 
     /* ── CTAs ────────────────────────────── */
@@ -1425,15 +1434,10 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     { label: 'Report',           fn: function() {
         _devRenderReport();
         _devShow('screen-report');
-        var els = document.querySelectorAll('.rs');
-        if ('IntersectionObserver' in window) {
-          var obs = new IntersectionObserver(function(entries) {
-            entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-          }, { threshold: 0.12 });
-          els.forEach(function(e) { obs.observe(e); });
-        } else {
-          els.forEach(function(e) { e.classList.add('visible'); });
-        }
+        var els = document.querySelectorAll('#screen-report .rs');
+        els.forEach(function(el, i) {
+          setTimeout(function() { el.classList.add('visible'); }, i * 120);
+        });
       }
     }
   ];
