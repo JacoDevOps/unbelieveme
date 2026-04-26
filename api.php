@@ -300,6 +300,10 @@ function handleDownloadReport($input) {
     $reportData = json_decode(file_get_contents($reportPath), true);
     $report = $reportData['report'] ?? [];
 
+    // Log the download
+    $logEntry = date('c') . ' | session:' . $sessionId . ' | email:' . ($reportData['email'] ?? 'unknown') . "\n";
+    @file_put_contents(DATA_DIR . '/download_log.txt', $logEntry, FILE_APPEND);
+
     $pdf = generateReportPDF($report);
 
     // Override the JSON content-type set at the top of the file

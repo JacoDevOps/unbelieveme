@@ -93,6 +93,25 @@ foreach ($rows as $r) {
     if (isset($dropoff[$p])) $dropoff[$p]++;
 }
 
+// ── Parse download log ───────────────────────────────────────
+$downloadLog = [];
+$dlLogPath   = DATA_DIR . '/download_log.txt';
+if (file_exists($dlLogPath)) {
+    $lines = file($dlLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $parts   = array_map('trim', explode('|', $line));
+        $entry   = ['date' => '', 'session' => '', 'email' => ''];
+        if (isset($parts[0])) $entry['date']    = trim($parts[0]);
+        if (isset($parts[1])) $entry['session'] = trim(str_replace('session:', '', $parts[1]));
+        if (isset($parts[2])) $entry['email']   = trim(str_replace('email:', '', $parts[2]));
+        $downloadLog[] = $entry;
+    }
+}
+usort($downloadLog, fn($a, $b) => strcmp($b['date'], $a['date']));
+
+$totalDownloads = count($downloadLog);
+$downloadRate   = $totalReports > 0 ? round($totalDownloads / $totalReports * 100) : 0;
+
 // ── Embed session + report data for JS ───────────────────────
 $jsSessionData = json_encode($sessions, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
 $jsReportData  = json_encode($reports,  JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
@@ -362,6 +381,38 @@ $jsQuestionTexts = json_encode($questionTexts, JSON_HEX_TAG | JSON_HEX_APOS | JS
       font-size: 12px;
       padding: 20px 0;
     }
+
+    /* ── Download activity ── */
+    .dl-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 48px;
+      border: 1px solid #2c2a26;
+    }
+    .dl-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid #2c2a26;
+      gap: 24px;
+    }
+    .dl-item:last-child { border-bottom: none; }
+    .dl-email {
+      font-size: 13px;
+      color: #c8c0b4;
+    }
+    .dl-date {
+      font-size: 11px;
+      color: #5a5650;
+      white-space: nowrap;
+    }
+    .dl-empty {
+      padding: 16px;
+      font-size: 12px;
+      color: #5a5650;
+    }
   </style>
 </head>
 <body>
@@ -381,6 +432,14 @@ $jsQuestionTexts = json_encode($questionTexts, JSON_HEX_TAG | JSON_HEX_APOS | JS
       <div class="stat-label">Completion rate</div>
       <div class="stat-value"><?php echo $completionRate; ?>%</div>
     </div>
+    <div class="stat">
+      <div class="stat-label">PDF downloads</div>
+      <div class="stat-value"><?php echo $totalDownloads; ?></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Download rate</div>
+      <div class="stat-value"><?php echo $downloadRate; ?>%</div>
+    </div>
   </div>
 
   <div class="section-title" style="margin-bottom:16px;">Drop-off by phase</div>
@@ -391,6 +450,18 @@ $jsQuestionTexts = json_encode($questionTexts, JSON_HEX_TAG | JSON_HEX_APOS | JS
       <div class="dropoff-count"><?php echo $count; ?></div>
     </div>
     <?php endforeach; ?>
+  </div>
+
+  <div class="section-title" style="margin-bottom:16px;">PDF downloads</div>
+  <div class="dl-list">
+    <?php if (empty($downloadLog)): ?>
+    <div class="dl-empty">No downloads yet.</div>
+    <?php else: foreach ($downloadLog as $dl): ?>
+    <div class="dl-item">
+      <span class="dl-email"><?php echo htmlspecialchars($dl['email']); ?></span>
+      <span class="dl-date"><?php echo $dl['date'] ? date('d M Y  H:i', strtotime($dl['date'])) : '—'; ?></span>
+    </div>
+    <?php endforeach; endif; ?>
   </div>
 
   <div class="section-title">Sessions <span style="color:#38352f;font-size:9px;letter-spacing:0.1em;">&nbsp;— click a row to expand</span></div>
