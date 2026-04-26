@@ -902,6 +902,7 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     <div class="quote-screen">
       <blockquote class="big-quote">"The cave you fear to enter holds the treasure you seek."</blockquote>
       <cite class="big-cite">— Joseph Campbell</cite>
+      <div style="margin-top:40px;"><button class="btn" id="btn-pre-quote">Continue →</button></div>
     </div>
   </div>
 
@@ -916,6 +917,9 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
         <p>Not to judge. Not to diagnose.</p>
         <p>To find the patterns that are difficult to see from inside your own life — and name them clearly, so you can finally decide what to do with them.</p>
         <p>What you're about to read was written from your answers. If something lands as true, it's because it came from you.</p>
+      </div>
+      <div class="t-btn-wrap">
+        <button class="btn" id="btn-pre-text">See your report →</button>
       </div>
     </div>
   </div>
@@ -1222,18 +1226,18 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
 
     function showPreQuote() {
       show('screen-pre-quote');
-      // Start fetching report in background immediately
+      // Start fetching report in background immediately so it's ready when the user arrives
       const reportPromise = fetchReport();
-      setTimeout(() => {
+      document.getElementById('btn-pre-quote').onclick = () => {
         show('screen-pre-text');
-        setTimeout(() => {
+        document.getElementById('btn-pre-text').onclick = () => {
           show('screen-load-report');
           // Report may already be done, or wait for it
           reportPromise.then(r => {
             if (r) { renderReport(r); show('screen-report'); initIO(); }
           });
-        }, 2200);
-      }, 4000);
+        };
+      };
     }
 
     /* ── Fetch Phase 2 ───────────────────── */
@@ -1299,6 +1303,9 @@ $devMode = isset($_GET['dev']) && $_GET['dev'] === 'preview2026';
     }
 
     function renderReport(r) {
+      // Report has its own logo (.report-logo) — hide the floating fixed logo
+      fixedLogo.classList.remove('visible');
+
       document.getElementById('r-pattern').innerHTML = esc(r.pattern || '');
       document.getElementById('r-values').innerHTML  = esc(r.values  || '');
       document.getElementById('r-goal').innerHTML    = esc(r.goal_insight || '');

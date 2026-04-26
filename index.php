@@ -537,35 +537,18 @@
   </footer>
 
   <script>
-    // JS-driven IntersectionObserver: set opacity:0 on load, then fade in when visible
+    // Staggered page-load animation — no scroll dependency, nothing ever stays hidden
     document.addEventListener('DOMContentLoaded', function() {
       var scrollEls = document.querySelectorAll('.scroll-fade');
-
-      // Start invisible (JS-controlled, so no-JS users still see content)
-      scrollEls.forEach(function(el) {
+      scrollEls.forEach(function(el, i) {
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         el.style.opacity = '0';
         el.style.transform = 'translateY(14px)';
-      });
-
-      if ('IntersectionObserver' in window) {
-        var obs = new IntersectionObserver(function(entries) {
-          entries.forEach(function(e) {
-            if (e.isIntersecting) {
-              e.target.style.opacity = '1';
-              e.target.style.transform = 'translateY(0)';
-              obs.unobserve(e.target);
-            }
-          });
-        }, { threshold: 0.05, rootMargin: '0px 0px 0px 0px' });
-
-        scrollEls.forEach(function(el) { obs.observe(el); });
-      } else {
-        scrollEls.forEach(function(el) {
+        setTimeout(function() {
           el.style.opacity = '1';
           el.style.transform = 'translateY(0)';
-        });
-      }
+        }, i * 50);
+      });
     });
   </script>
 
