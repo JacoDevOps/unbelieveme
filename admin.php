@@ -96,6 +96,21 @@ foreach ($rows as $r) {
 // ── Embed session + report data for JS ───────────────────────
 $jsSessionData = json_encode($sessions, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
 $jsReportData  = json_encode($reports,  JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
+
+// Phase 1 question texts (q1–q10 are fixed; q11–q20 are AI-generated per session and not stored)
+$questionTexts = [
+    'q1'  => 'If you had to describe where you are in your life right now in three words — not how you want to be, just honestly where you are — what would those three words be?',
+    'q2'  => 'What do you want most right now — the thing that, if it changed, would change everything else?',
+    'q3'  => 'Where in your life do you feel the most friction — the place where effort doesn\'t seem to translate into progress, or where the same situation keeps returning?',
+    'q4'  => 'Think about the area of your life you\'re most satisfied with right now. What\'s different about that area compared to the ones that feel harder?',
+    'q5'  => 'What\'s something you\'ve wanted for a long time that you haven\'t allowed yourself to fully pursue? Not something impossible — something that was possible, but didn\'t happen.',
+    'q6'  => 'When you imagine the version of your life that would feel fully right — not perfect, just right — what does a normal Tuesday look like?',
+    'q7'  => 'What feeling are you most trying to avoid in your daily life — the one you organise things around not having?',
+    'q8'  => 'What do you believe you need to have or be before your life can really begin — the condition you\'re waiting to meet?',
+    'q9'  => 'Where in your life do you feel most like yourself — most natural, most unguarded? And where do you feel most like a version of yourself you\'re performing?',
+    'q10' => 'What do people close to you say about you — the things they notice that you sometimes wish they didn\'t?',
+];
+$jsQuestionTexts = json_encode($questionTexts, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -272,11 +287,22 @@ $jsReportData  = json_encode($reports,  JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_
       color: #5a5650;
       margin-bottom: 6px;
     }
+    .detail-qa-q {
+      color: #7a7470;
+      font-size: 12px;
+      line-height: 1.55;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
     .detail-qa-ans {
       color: #c8c0b4;
       font-size: 13px;
       line-height: 1.65;
       white-space: pre-wrap;
+    }
+    .closing-q {
+      color: #b8a070;
+      font-style: italic;
     }
 
     /* Report */
@@ -402,8 +428,17 @@ $jsReportData  = json_encode($reports,  JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_
   </table>
 
 <script>
-const SESSIONS = <?php echo $jsSessionData; ?>;
-const REPORTS  = <?php echo $jsReportData; ?>;
+const SESSIONS   = <?php echo $jsSessionData; ?>;
+const REPORTS    = <?php echo $jsReportData; ?>;
+const Q_TEXTS    = <?php echo $jsQuestionTexts; ?>;
+
+// Phase labels for AI-generated questions
+const Q_PHASE = {
+  q11:'Phase 2 follow-up', q12:'Phase 2 follow-up', q13:'Phase 2 follow-up',
+  q14:'Phase 2 follow-up', q15:'Phase 2 follow-up', q16:'Phase 2 follow-up',
+  q17:'Phase 3 deep-dive', q18:'Phase 3 deep-dive', q19:'Phase 3 deep-dive',
+  q20:'Phase 3 deep-dive'
+};
 
 function esc(s) {
   return String(s == null ? '' : s)
@@ -414,24 +449,35 @@ function esc(s) {
 }
 
 function buildDetail(sid) {
-  const sess = SESSIONS[sid] || null;
-  const rep  = REPORTS[sid]  || null;
+  const sess    = SESSIONS[sid] || null;
+  const repFile = REPORTS[sid]  || null;
+  // Report content is nested one level deeper: repFile.report
+  const rep     = repFile ? (repFile.report || null) : null;
+  // Prefer answers from report file (complete set); fall back to session file
+  const answers = (repFile && repFile.answers) ? repFile.answers
+                : (sess && sess.answers)        ? sess.answers
+                : null;
+
   let html = '<div class="detail-wrap">';
 
   // ── Left column: Q&A ──────────────────────────────────────
   html += '<div class="detail-col"><div class="detail-col-title">Questions &amp; Answers</div>';
-  if (sess && sess.answers && Object.keys(sess.answers).length) {
-    const keys = Object.keys(sess.answers).sort(function(a, b) {
+  if (answers && Object.keys(answers).length) {
+    const keys = Object.keys(answers).sort(function(a, b) {
       var na = parseInt(a.replace(/\D/g, '')) || 0;
       var nb = parseInt(b.replace(/\D/g, '')) || 0;
       return na - nb;
     });
     for (var i = 0; i < keys.length; i++) {
       var k = keys[i];
-      var v = sess.answers[k];
+      var v = answers[k];
+      var qNum    = k.replace(/\D/g, '');
+      var qLabel  = 'Q' + qNum;
+      var qText   = Q_TEXTS[k] || Q_PHASE[k] || null;
       html += '<div class="detail-qa">'
-            +   '<div class="detail-qa-label">' + esc(k.toUpperCase()) + '</div>'
-            +   '<div class="detail-qa-ans">'   + esc(v) + '</div>'
+            +   '<div class="detail-qa-label">' + esc(qLabel) + '</div>'
+            +   (qText ? '<div class="detail-qa-q">' + esc(qText) + '</div>' : '')
+            +   '<div class="detail-qa-ans">' + esc(v) + '</div>'
             + '</div>';
     }
   } else {
@@ -449,10 +495,13 @@ function buildDetail(sid) {
             + '</div>';
     }
 
-    if (rep.values && rep.values.length) {
+    if (rep.values) {
+      var valText = Array.isArray(rep.values)
+        ? rep.values.map(function(v){ return esc(v); }).join(' &middot; ')
+        : esc(rep.values);
       html += '<div class="detail-rep-section">'
             +   '<div class="detail-rep-label">Values</div>'
-            +   '<div class="detail-rep-body">' + rep.values.map(function(v){ return esc(v); }).join(' &middot; ') + '</div>'
+            +   '<div class="detail-rep-body">' + valText + '</div>'
             + '</div>';
     }
 
@@ -462,12 +511,11 @@ function buildDetail(sid) {
         var belief = rep.beliefs[b];
         html += '<div class="detail-belief">'
               +   '<div class="detail-belief-name">' + esc(belief.name || '') + '</div>';
-        var bKeys = Object.keys(belief);
-        for (var bk = 0; bk < bKeys.length; bk++) {
-          var field = bKeys[bk];
-          if (field === 'name') continue;
-          var fval = belief[field];
-          if (typeof fval === 'string' && fval.trim()) {
+        var fieldOrder = ['where_it_shows_up','identity_protecting','cost','fundamental_shift','first_move'];
+        for (var fo = 0; fo < fieldOrder.length; fo++) {
+          var field = fieldOrder[fo];
+          var fval  = belief[field];
+          if (fval && typeof fval === 'string' && fval.trim()) {
             html += '<div class="detail-belief-field">'
                   +   '<span class="detail-belief-field-label">' + esc(field.replace(/_/g, ' ')) + '</span>'
                   +   '<span class="detail-belief-field-val">'   + esc(fval) + '</span>'
@@ -489,7 +537,7 @@ function buildDetail(sid) {
     if (rep.closing_question) {
       html += '<div class="detail-rep-section">'
             +   '<div class="detail-rep-label">Closing Question</div>'
-            +   '<div class="detail-rep-body">' + esc(rep.closing_question) + '</div>'
+            +   '<div class="detail-rep-body closing-q">' + esc(rep.closing_question) + '</div>'
             + '</div>';
     }
   } else {
