@@ -1,4 +1,17 @@
 <?php
+// FastCGI / PHP-FPM fallback: parse Authorization header manually
+if (!isset($_SERVER['PHP_AUTH_USER'])) {
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION']
+               ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+               ?? '';
+    if (stripos($authHeader, 'Basic ') === 0) {
+        $decoded = base64_decode(substr($authHeader, 6));
+        $parts   = explode(':', $decoded, 2);
+        $_SERVER['PHP_AUTH_USER'] = $parts[0] ?? '';
+        $_SERVER['PHP_AUTH_PW']   = $parts[1] ?? '';
+    }
+}
+
 if (!isset($_SERVER['PHP_AUTH_USER']) ||
     $_SERVER['PHP_AUTH_USER'] !== 'admin' ||
     $_SERVER['PHP_AUTH_PW'] !== 'ubm_admin_2026') {
