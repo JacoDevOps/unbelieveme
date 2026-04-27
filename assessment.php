@@ -1258,7 +1258,7 @@ $testMode = isset($_GET['dev']) && $_GET['dev'] === 'ubm_test_2026';
         const res  = await fetch('api.php?action=generate_phase2', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answers })
+          body: JSON.stringify({ session_id: sessionId, answers })
         });
         const data = await res.json();
         if (data.questions?.length) { p2Qs = data.questions; return true; }
@@ -1277,7 +1277,7 @@ $testMode = isset($_GET['dev']) && $_GET['dev'] === 'ubm_test_2026';
         const res  = await fetch('api.php?action=generate_phase3', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answers })
+          body: JSON.stringify({ session_id: sessionId, answers })
         });
         const data = await res.json();
         if (data.questions?.length) { p3Qs = data.questions; return true; }

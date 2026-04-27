@@ -93,6 +93,14 @@ EOT;
         return;
     }
 
+    // Save questions to session file for later reference
+    $sessionId = sanitiseSessionId($input['session_id'] ?? '');
+    if ($sessionId) {
+        $filePath = DATA_DIR . '/session_' . $sessionId . '.json';
+        $existing = file_exists($filePath) ? json_decode(file_get_contents($filePath), true) : [];
+        $existing['phase2_questions'] = $parsed['questions'];
+        file_put_contents($filePath, json_encode($existing, JSON_PRETTY_PRINT));
+    }
     echo json_encode($parsed);
 }
 
@@ -147,6 +155,14 @@ EOT;
         return;
     }
 
+    // Save questions to session file for later reference
+    $sessionId = sanitiseSessionId($input['session_id'] ?? '');
+    if ($sessionId) {
+        $filePath = DATA_DIR . '/session_' . $sessionId . '.json';
+        $existing = file_exists($filePath) ? json_decode(file_get_contents($filePath), true) : [];
+        $existing['phase3_questions'] = $parsed['questions'];
+        file_put_contents($filePath, json_encode($existing, JSON_PRETTY_PRINT));
+    }
     echo json_encode($parsed);
 }
 
