@@ -394,7 +394,7 @@
       <div class="hero-price">€36.90</div>
 
       <div class="hero-cta">
-        <a class="btn-hero" href="<?php echo defined('STRIPE_PAYMENT_LINK') ? htmlspecialchars(STRIPE_PAYMENT_LINK) : '#'; ?>">
+        <a class="btn-hero" href="https://buy.stripe.com/eVq6oGeHx3Ol30N7xTeIw00">
           Begin the assessment →
         </a>
       </div>
@@ -521,7 +521,7 @@
       <div class="offer-price scroll-fade">€36.90</div>
 
       <div class="scroll-fade" style="margin-top: 20px;">
-        <a class="btn-hero" href="<?php echo defined('STRIPE_PAYMENT_LINK') ? htmlspecialchars(STRIPE_PAYMENT_LINK) : '#'; ?>">
+        <a class="btn-hero" href="https://buy.stripe.com/eVq6oGeHx3Ol30N7xTeIw00">
           Begin the assessment →
         </a>
       </div>
